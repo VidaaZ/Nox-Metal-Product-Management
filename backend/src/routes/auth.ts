@@ -110,25 +110,5 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// Get current user profile
-router.get('/profile', authenticateToken, (req: AuthenticatedRequest, res) => {
-  res.json({
-    user: req.user
-  });
-});
-
-// Refresh token
-router.post('/refresh', authenticateToken, (req: AuthenticatedRequest, res) => {
-  if (!req.user) {
-    return res.status(401).json({ error: 'Invalid token' });
-  }
-
-  const newToken = generateToken(req.user);
-  
-  res.json({
-    token: newToken,
-    user: req.user
-  });
-});
 
 export default router; 
