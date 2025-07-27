@@ -1,8 +1,7 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
-import LoginForm from './components/auth/LoginForm';
-import RegisterForm from './components/auth/RegisterForm';
+import AuthForm from './components/auth/AuthForm';
 import ProtectedRoute from './components/ProtectedRoute';
 import Dashboard from './components/Dashboard';
 import ProductManagement from './components/ProductManagement';
@@ -28,19 +27,11 @@ function App() {
       <Routes>
         {/* Public routes */}
         <Route 
-          path="/login" 
+          path="/auth" 
           element={
             isAuthenticated ? 
             <Navigate to="/dashboard" replace /> : 
-            <LoginForm />
-          } 
-        />
-        <Route 
-          path="/register" 
-          element={
-            isAuthenticated ? 
-            <Navigate to="/dashboard" replace /> : 
-            <RegisterForm />
+            <AuthForm />
           } 
         />
         
@@ -72,13 +63,17 @@ function App() {
           } 
         />
         
+        {/* Backwards compatibility redirects */}
+        <Route path="/login" element={<Navigate to="/auth" replace />} />
+        <Route path="/register" element={<Navigate to="/auth" replace />} />
+        
         {/* Default redirects */}
         <Route 
           path="/" 
           element={
             isAuthenticated ? 
             <Navigate to="/dashboard" replace /> : 
-            <Navigate to="/login" replace />
+            <Navigate to="/auth" replace />
           } 
         />
         

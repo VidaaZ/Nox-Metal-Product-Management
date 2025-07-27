@@ -9,7 +9,7 @@ const Navigation: React.FC = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate('/auth');
   };
 
   const isActive = (path: string) => {
@@ -23,7 +23,7 @@ const Navigation: React.FC = () => {
           <div className="flex items-center">
             <Link to="/dashboard" className="flex-shrink-0 flex items-center">
               <h1 className="text-xl font-bold text-gray-800">
-                🚀 Nox Metal
+                Nox Metal
               </h1>
             </Link>
             

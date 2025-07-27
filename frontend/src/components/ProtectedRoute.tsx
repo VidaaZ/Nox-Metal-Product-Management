@@ -23,8 +23,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   if (!isAuthenticated) {
-    // Redirect to login with the attempted location
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    // Redirect to auth with the attempted location
+    return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 
   if (requireAdmin && user?.role !== 'admin') {
