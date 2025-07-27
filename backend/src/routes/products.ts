@@ -17,7 +17,7 @@ router.get('/', authenticateToken, async (req: AuthenticatedRequest, res) => {
       sortOrder = 'desc',
       includeDeleted = false
     }: ProductQuery = req.query as any;
-
+//pagination
     const offset = (Number(page) - 1) * Number(limit);
     const isAdmin = req.user?.role === 'admin';
     
@@ -27,14 +27,14 @@ router.get('/', authenticateToken, async (req: AuthenticatedRequest, res) => {
     let whereClause = showDeleted ? '' : 'WHERE is_deleted = 0';
     let searchClause = '';
     let params: any[] = [];
-
+//Filtering(search)
     if (search) {
       searchClause = showDeleted 
         ? 'WHERE (name LIKE ? OR description LIKE ?)'
         : 'AND (name LIKE ? OR description LIKE ?)';
       params.push(`%${search}%`, `%${search}%`);
     }
-
+//sorting
     const orderClause = `ORDER BY ${sortBy} ${sortOrder}`;
 
     // Get total count
