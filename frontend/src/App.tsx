@@ -50,27 +50,25 @@ function App() {
 
   if (currentView === 'login') {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4">
-        <LoginForm 
-          onLogin={handleLogin}
-          isLoading={isLoading}
-          error={error}
-          onSwitchToRegister={() => setCurrentView('register')}
-        />
-      </div>
+      <LoginForm 
+        onLogin={handleLogin}
+        isLoading={isLoading}
+        error={error}
+        onSwitchToRegister={() => setCurrentView('register')}
+        onBack={() => setCurrentView('welcome')}
+      />
     );
   }
 
   if (currentView === 'register') {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4">
-        <RegisterForm 
-          onRegister={handleRegister}
-          isLoading={isLoading}
-          error={error}
-          onSwitchToLogin={() => setCurrentView('login')}
-        />
-      </div>
+      <RegisterForm 
+        onRegister={handleRegister}
+        isLoading={isLoading}
+        error={error}
+        onSwitchToLogin={() => setCurrentView('login')}
+        onBack={() => setCurrentView('welcome')}
+      />
     );
   }
 

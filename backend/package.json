@@ -4,10 +4,10 @@
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
-    "dev": "nodemon src/index.ts",
+    "dev": "nodemon --exec \"node --loader ts-node/esm\" src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "create-admin": "ts-node src/scripts/createAdmin.ts",
+    "create-admin": "node --loader ts-node/esm src/scripts/createAdmin.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
