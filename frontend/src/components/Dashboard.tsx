@@ -84,7 +84,7 @@ const Dashboard: React.FC = () => {
       <div className={styles.wrapper}>
         <div className={styles.header}>
           <h1 className={styles.title}>
-            Welcome back, {user?.email}!
+            Welcome back, {user?.full_name || user?.email}!
           </h1>
           <p className={styles.subtitle}>
             Here's what's happening with your product management system.
@@ -203,53 +203,6 @@ const Dashboard: React.FC = () => {
                   </Link>
                 </>
               )}
-            </div>
-          </div>
-        </div>
-
-        {/* Features Overview */}
-        <div className={styles.featuresOverview}>
-          <div className={styles.featuresHeader}>
-            <h3 className={styles.featuresTitle}>System Features</h3>
-          </div>
-          <div className={styles.featuresContent}>
-            <div className={styles.featuresGrid}>
-              <div className={styles.featureSection}>
-                <h4 className={`${styles.featureSectionTitle} ${styles.implemented}`}>
-                  ✅ Implemented Features
-                </h4>
-                <ul className={`${styles.featureList} ${styles.implemented}`}>
-                  <li className={styles.featureItem}>JWT Authentication & Authorization</li>
-                  <li className={styles.featureItem}>Role-based Access Control</li>
-                  <li className={styles.featureItem}>Product CRUD Operations</li>
-                  <li className={styles.featureItem}>Search, Pagination & Sorting</li>
-                  <li className={styles.featureItem}>Soft Delete Functionality</li>
-                  <li className={styles.featureItem}>Comprehensive Audit Logging</li>
-                  <li className={styles.featureItem}>Responsive Product Management UI</li>
-                  <li className={styles.featureItem}>Admin Dashboard & Controls</li>
-                </ul>
-              </div>
-              <div className={styles.featureSection}>
-                <h4 className={`${styles.featureSectionTitle} ${styles.permissions}`}>
-                  📋 Your Permissions
-                </h4>
-                <ul className={`${styles.featureList} ${styles.permissions}`}>
-                  <li className={styles.featureItem}>View all products</li>
-                  <li className={styles.featureItem}>Search and filter products</li>
-                  {isAdmin ? (
-                    <>
-                      <li className={styles.featureItem}>Create new products</li>
-                      <li className={styles.featureItem}>Edit existing products</li>
-                      <li className={styles.featureItem}>Delete/restore products</li>
-                      <li className={styles.featureItem}>View deleted products</li>
-                      <li className={styles.featureItem}>Access audit logs</li>
-                      <li className={styles.featureItem}>Manage all product data</li>
-                    </>
-                  ) : (
-                    <li className={styles.featureItem}>Read-only access to products</li>
-                  )}
-                </ul>
-              </div>
             </div>
           </div>
         </div>

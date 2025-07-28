@@ -21,12 +21,25 @@ function initializeTables() {
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       email TEXT UNIQUE NOT NULL,
+      full_name TEXT NOT NULL,
       password TEXT NOT NULL,
       role TEXT NOT NULL DEFAULT 'user' CHECK (role IN ('admin', 'user')),
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `);
+
+  // Add full_name column to existing users table if it doesn't exist
+  db.all("PRAGMA table_info(users)", (err, rows) => {
+    if (!err && rows) {
+      const columns = rows as any[];
+      const hasFullName = columns.some(col => col.name === 'full_name');
+      if (!hasFullName) {
+        db.run(`ALTER TABLE users ADD COLUMN full_name TEXT DEFAULT ''`);
+        console.log('Added full_name column to users table');
+      }
+    }
+  });
 
   // Products table
   db.run(`

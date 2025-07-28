@@ -1,6 +1,7 @@
 export interface User {
   id: number;
   email: string;
+  full_name: string;
   role: 'admin' | 'user';
 }
 
@@ -11,6 +12,7 @@ export interface LoginCredentials {
 
 export interface RegisterCredentials {
   email: string;
+  full_name: string;
   password: string;
   role?: 'admin' | 'user';
 }

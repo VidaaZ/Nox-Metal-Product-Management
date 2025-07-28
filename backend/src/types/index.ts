@@ -1,6 +1,7 @@
 export interface User {
   id: number;
   email: string;
+  full_name: string;
   password: string;
   role: 'admin' | 'user';
   created_at: string;
@@ -9,6 +10,7 @@ export interface User {
 
 export interface UserInput {
   email: string;
+  full_name: string;
   password: string;
   role?: 'admin' | 'user';
 }
@@ -54,6 +56,7 @@ export interface AuditLog {
 export interface AuthenticatedUser {
   id: number;
   email: string;
+  full_name: string;
   role: 'admin' | 'user';
 }
 

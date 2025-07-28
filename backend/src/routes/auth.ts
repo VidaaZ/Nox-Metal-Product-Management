@@ -7,13 +7,48 @@ import { authenticateToken, AuthenticatedRequest } from '../middleware/auth.js';
 
 const router = express.Router();
 
+// Get current user profile
+router.get('/profile', authenticateToken, async (req: AuthenticatedRequest, res) => {
+  try {
+    const userId = req.user?.id;
+    
+    if (!userId) {
+      return res.status(401).json({ error: 'User not authenticated' });
+    }
+
+    // Get user from database
+    const user = await new Promise<User | undefined>((resolve, reject) => {
+      db.get('SELECT * FROM users WHERE id = ?', [userId], (err, row: User) => {
+        if (err) reject(err);
+        else resolve(row);
+      });
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const authenticatedUser: AuthenticatedUser = {
+      id: user.id,
+      email: user.email,
+      full_name: user.full_name,
+      role: user.role
+    };
+
+    res.json({ user: authenticatedUser });
+  } catch (error) {
+    console.error('Profile error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // Register new user
 router.post('/register', async (req, res) => {
   try {
-    const { email, password, role = 'user' }: UserInput = req.body;
+    const { email, full_name, password, role = 'user' }: UserInput = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required' });
+    if (!email || !full_name || !password) {
+      return res.status(400).json({ error: 'Email, full name, and password are required' });
     }
 
     // Check if user already exists
@@ -35,8 +70,8 @@ router.post('/register', async (req, res) => {
     // Insert user
     const result = await new Promise<{ id: number }>((resolve, reject) => {
       db.run(
-        'INSERT INTO users (email, password, role) VALUES (?, ?, ?)',
-        [email, hashedPassword, role],
+        'INSERT INTO users (email, full_name, password, role) VALUES (?, ?, ?, ?)',
+        [email, full_name, hashedPassword, role],
         function (err) {
           if (err) reject(err);
           else resolve({ id: this.lastID });
@@ -47,6 +82,7 @@ router.post('/register', async (req, res) => {
     const user: AuthenticatedUser = {
       id: result.id,
       email,
+      full_name,
       role: role as 'admin' | 'user'
     };
 
@@ -94,6 +130,7 @@ router.post('/login', async (req, res) => {
     const authenticatedUser: AuthenticatedUser = {
       id: user.id,
       email: user.email,
+      full_name: user.full_name,
       role: user.role
     };
 
@@ -109,6 +146,5 @@ router.post('/login', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
 
 export default router; 

@@ -118,11 +118,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       dispatch({ type: 'AUTH_START' });
       const response = await authAPI.login(credentials);
       
+      // Ensure user has full_name field for backward compatibility
+      const userWithFullName = {
+        ...response.user,
+        full_name: response.user.full_name || response.user.email.split('@')[0]
+      };
+      
       // Store token and user
       localStorage.setItem('auth_token', response.token);
-      localStorage.setItem('user', JSON.stringify(response.user));
+      localStorage.setItem('user', JSON.stringify(userWithFullName));
       
-      dispatch({ type: 'AUTH_SUCCESS', payload: response.user });
+      dispatch({ type: 'AUTH_SUCCESS', payload: userWithFullName });
     } catch (error: any) {
       const errorMessage = error.response?.data?.error || 'Login failed';
       dispatch({ type: 'AUTH_ERROR', payload: errorMessage });

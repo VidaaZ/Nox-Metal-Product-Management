@@ -8,6 +8,7 @@ export const generateToken = (user: AuthenticatedUser): string => {
   const payload = {
     id: user.id,
     email: user.email,
+    full_name: user.full_name,
     role: user.role
   };
   
@@ -20,6 +21,7 @@ export const verifyToken = (token: string): AuthenticatedUser | null => {
     return {
       id: decoded.id,
       email: decoded.email,
+      full_name: decoded.full_name,
       role: decoded.role
     };
   } catch (error) {

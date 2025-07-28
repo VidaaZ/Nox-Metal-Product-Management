@@ -15,6 +15,7 @@ const AuthForm: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [credentials, setCredentials] = useState({
     email: '',
+    full_name: '',
     password: '',
     role: 'user' as 'user' | 'admin'
   });
@@ -33,6 +34,7 @@ const AuthForm: React.FC = () => {
       } else {
         const registerData: RegisterCredentials = {
           email: credentials.email,
+          full_name: credentials.full_name,
           password: credentials.password,
           role: credentials.role
         };
@@ -57,6 +59,7 @@ const AuthForm: React.FC = () => {
     // Clear any existing errors when switching modes
     setCredentials({
       email: '',
+      full_name: '',
       password: '',
       role: 'user'
     });
@@ -88,6 +91,22 @@ const AuthForm: React.FC = () => {
           
           <div className={styles.formContent}>
             <form className={styles.form} onSubmit={handleSubmit}>
+              {mode === 'register' && (
+                <div className={styles.inputGroup}>
+                  <input
+                    id="full_name"
+                    name="full_name"
+                    type="text"
+                    required
+                    className={styles.input}
+                    placeholder="Enter your full name"
+                    value={credentials.full_name}
+                    onChange={handleChange}
+                    disabled={isLoading}
+                  />
+                </div>
+              )}
+
               <div className={styles.inputGroup}>
                 <input
                   id="email"
@@ -170,15 +189,6 @@ const AuthForm: React.FC = () => {
 
           {/* Bottom Links */}
           <div className={styles.bottomLinks}>
-            {mode === 'login' && (
-              <div className={styles.forgotLinks}>
-                <span>Forgot</span>
-                <a href="#" className={styles.forgotLink}>Username</a>
-                <span>/</span>
-                <a href="#" className={styles.forgotLink}>Password</a>
-                <span>?</span>
-              </div>
-            )}
             <div className={styles.switchMode}>
               <span>
                 {mode === 'login' ? "Don't have an account? " : "Already have an account? "}

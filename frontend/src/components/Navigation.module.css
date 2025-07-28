@@ -1,0 +1,344 @@
+/* Navigation.module.css */
+
+.nav {
+  background-color: white;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid #e5e7eb;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+}
+
+.container {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.navContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 4rem;
+  gap: 2rem;
+}
+
+.leftSection {
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+  flex: 1;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+  flex-shrink: 0;
+}
+
+.brandTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.navLink {
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  color: #6b7280;
+  position: relative;
+}
+
+.navLink:hover {
+  color: #111827;
+  background-color: #f9fafb;
+}
+
+.navLink.active {
+  color: #1d4ed8;
+  background-color: #dbeafe;
+  font-weight: 600;
+}
+
+.navLink.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #3b82f6 0%, #1d4ed8 100%);
+  border-radius: 1px;
+}
+
+.rightSection {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-shrink: 0;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem;
+  background-color: #f9fafb;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+}
+
+.userEmail {
+  font-size: 0.875rem;
+  color: #374151;
+  font-weight: 500;
+}
+
+.userRole {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  text-transform: capitalize;
+}
+
+.userRole.admin {
+  background-color: #f3e8ff;
+  color: #7c3aed;
+}
+
+.userRole.user {
+  background-color: #dcfce7;
+  color: #059669;
+}
+
+.logoutButton {
+  padding: 0.5rem 1.25rem;
+  background-color: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.logoutButton:hover {
+  background-color: #e5e7eb;
+  border-color: #9ca3af;
+  color: #111827;
+}
+
+.logoutButton:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Mobile Menu */
+.mobileMenu {
+  display: none;
+  border-top: 1px solid #e5e7eb;
+  background-color: white;
+}
+
+.mobileMenu.open {
+  display: block;
+}
+
+.mobileMenuContent {
+  padding: 1rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.mobileNavLink {
+  display: block;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  color: #6b7280;
+}
+
+.mobileNavLink:hover {
+  color: #111827;
+  background-color: #f9fafb;
+}
+
+.mobileNavLink.active {
+  color: #1d4ed8;
+  background-color: #dbeafe;
+  font-weight: 600;
+}
+
+.mobileUserInfo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  border-top: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+}
+
+.mobileUserDetails {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.mobileLogoutButton {
+  padding: 0.5rem 1rem;
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mobileLogoutButton:hover {
+  background-color: #dc2626;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .navLinks {
+    gap: 0.75rem;
+  }
+  
+  .navLink {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8125rem;
+  }
+  
+  .rightSection {
+    gap: 1rem;
+  }
+  
+  .userInfo {
+    padding: 0.375rem 0.75rem;
+  }
+  
+  .userEmail {
+    font-size: 0.8125rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 1rem;
+  }
+  
+  .leftSection {
+    gap: 1.5rem;
+  }
+  
+  .navLinks {
+    display: none;
+  }
+  
+  .rightSection {
+    gap: 0.75rem;
+  }
+  
+  .userInfo {
+    padding: 0.25rem 0.5rem;
+  }
+  
+  .userEmail {
+    font-size: 0.75rem;
+  }
+  
+  .logoutButton {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.8125rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .navContent {
+    height: 3.5rem;
+  }
+  
+  .brandTitle {
+    font-size: 1.125rem;
+  }
+  
+  .userInfo {
+    display: none;
+  }
+  
+  .mobileMenu {
+    display: block;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .nav {
+    background-color: #1f2937;
+    border-bottom-color: #374151;
+  }
+  
+  .brandTitle {
+    color: #f9fafb;
+  }
+  
+  .navLink {
+    color: #d1d5db;
+  }
+  
+  .navLink:hover {
+    color: #f9fafb;
+    background-color: #374151;
+  }
+  
+  .navLink.active {
+    color: #60a5fa;
+    background-color: #1e3a8a;
+  }
+  
+  .userInfo {
+    background-color: #374151;
+    border-color: #4b5563;
+  }
+  
+  .userEmail {
+    color: #d1d5db;
+  }
+  
+  .logoutButton {
+    background-color: #374151;
+    color: #d1d5db;
+    border-color: #4b5563;
+  }
+  
+  .logoutButton:hover {
+    background-color: #4b5563;
+    color: #f9fafb;
+  }
+} 
