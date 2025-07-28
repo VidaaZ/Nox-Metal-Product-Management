@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { auditAPI } from '../lib/api';
 import type { AuditLog, AuditLogsResponse } from '../types';
+import styles from './AuditLogs.module.css';
 
 const AuditLogs: React.FC = () => {
   const { user } = useAuth();
@@ -47,18 +48,18 @@ const AuditLogs: React.FC = () => {
     });
   };
 
-  const getActionColor = (action: string) => {
+  const getActionIconClass = (action: string) => {
     switch (action.toLowerCase()) {
       case 'create':
-        return 'bg-green-100 text-green-800';
+        return styles.create;
       case 'update':
-        return 'bg-blue-100 text-blue-800';
+        return styles.update;
       case 'delete':
-        return 'bg-red-100 text-red-800';
+        return styles.delete;
       case 'restore':
-        return 'bg-purple-100 text-purple-800';
+        return styles.restore;
       default:
-        return 'bg-gray-100 text-gray-800';
+        return styles.default;
     }
   };
 
@@ -66,31 +67,31 @@ const AuditLogs: React.FC = () => {
     switch (action.toLowerCase()) {
       case 'create':
         return (
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
           </svg>
         );
       case 'update':
         return (
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
           </svg>
         );
       case 'delete':
         return (
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
           </svg>
         );
       case 'restore':
         return (
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
           </svg>
         );
       default:
         return (
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
         );
@@ -99,11 +100,11 @@ const AuditLogs: React.FC = () => {
 
   if (!isAdmin) {
     return (
-      <div className="min-h-screen bg-gray-50 pt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">Access Denied</h1>
-            <p className="text-gray-600">You need admin privileges to view audit logs.</p>
+      <div className={styles.accessDenied}>
+        <div className={styles.accessDeniedWrapper}>
+          <div className={styles.accessDeniedContent}>
+            <h1 className={styles.accessDeniedTitle}>Access Denied</h1>
+            <p className={styles.accessDeniedText}>You need admin privileges to view audit logs.</p>
           </div>
         </div>
       </div>
@@ -111,126 +112,104 @@ const AuditLogs: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className={styles.container}>
+      <div className={styles.wrapper}>
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Audit Logs</h1>
-          <p className="mt-2 text-gray-600">
+        <div className={styles.header}>
+          <h1 className={styles.title}>Audit Logs</h1>
+          <p className={styles.subtitle}>
             Track all product-related activities and system changes.
           </p>
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md">
-            <div className="text-sm text-red-700">{error}</div>
+          <div className={styles.error}>
+            <div className={styles.errorText}>{error}</div>
           </div>
         )}
 
         {/* Stats */}
-        <div className="bg-white shadow rounded-lg mb-6">
-          <div className="px-4 py-5 sm:p-6">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <div className="w-8 h-8 bg-purple-500 rounded-md flex items-center justify-center">
-                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                </div>
+        <div className={styles.statsCard}>
+          <div className={styles.statsContent}>
+            <div className={styles.statsHeader}>
+              <div className={styles.statsIcon}>
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
               </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">
-                    Total Audit Entries
-                  </dt>
-                  <dd className="text-lg font-medium text-gray-900">
-                    {totalLogs}
-                  </dd>
-                </dl>
+              <div className={styles.statsInfo}>
+                <div className={styles.statsLabel}>Total Audit Entries</div>
+                <div className={styles.statsValue}>{totalLogs}</div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Audit Logs */}
-        <div className="bg-white shadow rounded-lg">
-          <div className="px-4 py-5 sm:p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-medium text-gray-900">
-                Recent Activity
-              </h3>
-              <button
-                onClick={loadLogs}
-                disabled={loading}
-                className="bg-gray-100 text-gray-700 px-3 py-1 rounded-md text-sm hover:bg-gray-200 transition-colors disabled:opacity-50"
-              >
-                {loading ? 'Refreshing...' : 'Refresh'}
-              </button>
-            </div>
+        <div className={styles.auditContainer}>
+          <div className={styles.auditHeader}>
+            <h3 className={styles.auditTitle}>Recent Activity</h3>
+            <button
+              onClick={loadLogs}
+              disabled={loading}
+              className={styles.refreshButton}
+            >
+              {loading ? 'Refreshing...' : 'Refresh'}
+            </button>
+          </div>
 
+          <div className={styles.auditContent}>
             {loading ? (
-              <div className="animate-pulse space-y-4">
+              <div className={styles.loadingContainer}>
                 {[1, 2, 3, 4, 5].map((i) => (
-                  <div key={i} className="border rounded-lg p-4">
-                    <div className="h-4 bg-gray-200 rounded w-1/4 mb-2"></div>
-                    <div className="h-3 bg-gray-200 rounded w-3/4 mb-1"></div>
-                    <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                  <div key={i} className={styles.loadingItem}>
+                    <div className={styles.loadingBar1}></div>
+                    <div className={styles.loadingBar2}></div>
+                    <div className={styles.loadingBar3}></div>
                   </div>
                 ))}
               </div>
             ) : logs.length === 0 ? (
-              <div className="text-center py-12">
-                <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className={styles.emptyContainer}>
+                <svg className={styles.emptyIcon} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                <h3 className="mt-2 text-sm font-medium text-gray-900">No audit logs found</h3>
-                <p className="mt-1 text-sm text-gray-500">
+                <h3 className={styles.emptyTitle}>No audit logs found</h3>
+                <p className={styles.emptyText}>
                   Audit logs will appear here as users perform actions.
                 </p>
               </div>
             ) : (
               <>
-                <div className="flow-root">
-                  <ul className="-mb-8">
+                <div className={styles.timeline}>
+                  <ul className={styles.timelineList}>
                     {logs.map((log, logIdx) => (
-                      <li key={log.id}>
-                        <div className="relative pb-8">
-                          {logIdx !== logs.length - 1 ? (
-                            <span
-                              className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200"
-                              aria-hidden="true"
-                            />
-                          ) : null}
-                          <div className="relative flex space-x-3">
-                            <div>
-                              <span className={`h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white ${getActionColor(log.action)}`}>
-                                {getActionIcon(log.action)}
-                              </span>
-                            </div>
-                            <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
-                              <div>
-                                <p className="text-sm text-gray-900">
-                                  <span className="font-medium">{log.user_email}</span>{' '}
-                                  <span className="lowercase">{log.action}</span>{' '}
-                                  {log.product_name && (
-                                    <>
-                                      product <span className="font-medium">"{log.product_name}"</span>
-                                    </>
-                                  )}
-                                  {log.product_id && (
-                                    <span className="text-gray-500"> (ID: {log.product_id})</span>
-                                  )}
-                                </p>
-                                {log.details && (
-                                  <p className="mt-1 text-sm text-gray-500">
-                                    {log.details}
-                                  </p>
-                                )}
-                              </div>
-                              <div className="text-right text-sm whitespace-nowrap text-gray-500">
-                                {formatDate(log.timestamp)}
-                              </div>
-                            </div>
+                      <li key={log.id} className={styles.timelineItem}>
+                        <div className={styles.timelineContent}>
+                          <div className={`${styles.timelineIcon} ${getActionIconClass(log.action)}`}>
+                            {getActionIcon(log.action)}
+                          </div>
+                          <div className={styles.timelineDetails}>
+                            <p className={styles.timelineText}>
+                              <strong>{log.user_email}</strong>{' '}
+                              <span className="lowercase">{log.action}</span>{' '}
+                              {log.product_name && (
+                                <>
+                                  product <strong>"{log.product_name}"</strong>
+                                </>
+                              )}
+                              {log.product_id && (
+                                <span className={styles.timelineDetailsText}> (ID: {log.product_id})</span>
+                              )}
+                            </p>
+                            {log.details && (
+                              <p className={styles.timelineDetailsText}>
+                                {log.details}
+                              </p>
+                            )}
+                          </div>
+                          <div className={styles.timelineTimestamp}>
+                            {formatDate(log.timestamp)}
                           </div>
                         </div>
                       </li>
@@ -240,66 +219,62 @@ const AuditLogs: React.FC = () => {
 
                 {/* Pagination */}
                 {totalPages > 1 && (
-                  <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6 mt-6">
-                    <div className="flex flex-1 justify-between sm:hidden">
+                  <div className={styles.pagination}>
+                    <div className={styles.paginationMobile}>
                       <button
                         onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                         disabled={currentPage === 1}
-                        className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                        className={styles.paginationButton}
                       >
                         Previous
                       </button>
                       <button
                         onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                         disabled={currentPage === totalPages}
-                        className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                        className={styles.paginationButton}
                       >
                         Next
                       </button>
                     </div>
-                    <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-                      <div>
-                        <p className="text-sm text-gray-700">
-                          Page <span className="font-medium">{currentPage}</span> of{' '}
-                          <span className="font-medium">{totalPages}</span>
-                        </p>
+                    <div className={styles.paginationDesktop}>
+                      <div className={styles.paginationInfo}>
+                        Page <strong>{currentPage}</strong> of{' '}
+                        <strong>{totalPages}</strong>
                       </div>
-                      <div>
-                        <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
-                          <button
-                            onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                            disabled={currentPage === 1}
-                            className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
-                          >
-                            Previous
-                          </button>
-                          
-                          {/* Page numbers */}
-                          {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                            const page = Math.max(1, Math.min(totalPages - 4, currentPage - 2)) + i;
-                            return (
-                              <button
-                                key={page}
-                                onClick={() => setCurrentPage(page)}
-                                className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${
-                                  page === currentPage
-                                    ? 'z-10 bg-purple-600 text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-600'
-                                    : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0'
-                                }`}
-                              >
-                                {page}
-                              </button>
-                            );
-                          })}
-                          
-                          <button
-                            onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                            disabled={currentPage === totalPages}
-                            className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
-                          >
-                            Next
-                          </button>
-                        </nav>
+                      <div className={styles.paginationNav}>
+                        <button
+                          onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                          disabled={currentPage === 1}
+                          className={`${styles.paginationButton} ${styles.roundedLeft}`}
+                        >
+                          Previous
+                        </button>
+                        
+                        {/* Page numbers */}
+                        {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                          const page = Math.max(1, Math.min(totalPages - 4, currentPage - 2)) + i;
+                          return (
+                            <button
+                              key={page}
+                              onClick={() => setCurrentPage(page)}
+                              className={`${styles.paginationButton} ${
+                                page === currentPage ? styles.active : ''
+                              } ${i === 0 ? styles.roundedLeft : ''} ${
+                                i === Math.min(4, totalPages - 1) ? styles.roundedRight : ''
+                              } ${i > 0 && i < Math.min(4, totalPages - 1) ? styles.middle : ''}`}
+                            >
+                              {page}
+                            </button>
+                          );
+                        })}
+                        
+                        <button
+                          onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                          disabled={currentPage === totalPages}
+                          className={`${styles.paginationButton} ${styles.roundedRight}`}
+                        >
+                          Next
+                        </button>
                       </div>
                     </div>
                   </div>

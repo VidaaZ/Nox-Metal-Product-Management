@@ -1,0 +1,503 @@
+/* AuditLogs.module.css */
+
+.container {
+  min-height: 100vh;
+  background-color: #f9fafb;
+  padding-top: 4rem;
+}
+
+.wrapper {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.header {
+  margin-bottom: 2rem;
+}
+
+.title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  color: #6b7280;
+  font-size: 1.125rem;
+}
+
+.error {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 0.5rem;
+}
+
+.errorText {
+  font-size: 0.875rem;
+  color: #dc2626;
+}
+
+/* Access Denied */
+.accessDenied {
+  min-height: 100vh;
+  background-color: #f9fafb;
+  padding-top: 4rem;
+}
+
+.accessDeniedWrapper {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.accessDeniedContent {
+  text-align: center;
+}
+
+.accessDeniedTitle {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 1rem;
+}
+
+.accessDeniedText {
+  color: #6b7280;
+  font-size: 1.125rem;
+}
+
+/* Stats Card */
+.statsCard {
+  background-color: white;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border-radius: 0.75rem;
+  border: 1px solid #e5e7eb;
+  margin-bottom: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.statsCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.statsContent {
+  padding: 1.5rem;
+}
+
+.statsHeader {
+  display: flex;
+  align-items: center;
+}
+
+.statsIcon {
+  flex-shrink: 0;
+  width: 3rem;
+  height: 3rem;
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+}
+
+.statsIcon svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: white;
+}
+
+.statsInfo {
+  flex: 1;
+}
+
+.statsLabel {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6b7280;
+  margin-bottom: 0.25rem;
+}
+
+.statsValue {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+/* Audit Logs Container */
+.auditContainer {
+  background-color: white;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border-radius: 0.75rem;
+  border: 1px solid #e5e7eb;
+}
+
+.auditHeader {
+  padding: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.auditTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.refreshButton {
+  background-color: #f3f4f6;
+  color: #374151;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.refreshButton:hover {
+  background-color: #e5e7eb;
+}
+
+.refreshButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.auditContent {
+  padding: 1.5rem;
+}
+
+/* Loading States */
+.loadingContainer {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.loadingItem {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.loadingBar1 {
+  height: 1rem;
+  background-color: #e5e7eb;
+  border-radius: 0.25rem;
+  width: 25%;
+  margin-bottom: 0.5rem;
+}
+
+.loadingBar2 {
+  height: 0.75rem;
+  background-color: #e5e7eb;
+  border-radius: 0.25rem;
+  width: 75%;
+  margin-bottom: 0.25rem;
+}
+
+.loadingBar3 {
+  height: 0.75rem;
+  background-color: #e5e7eb;
+  border-radius: 0.25rem;
+  width: 50%;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: .5;
+  }
+}
+
+/* Empty State */
+.emptyContainer {
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.emptyIcon {
+  margin: 0 auto 1rem;
+  width: 3rem;
+  height: 3rem;
+  color: #9ca3af;
+}
+
+.emptyTitle {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.emptyText {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+/* Timeline */
+.timeline {
+  position: relative;
+}
+
+.timelineList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.timelineItem {
+  position: relative;
+  padding-bottom: 2rem;
+}
+
+.timelineItem:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 2rem;
+  left: 1.5rem;
+  width: 2px;
+  height: calc(100% - 2rem);
+  background-color: #e5e7eb;
+}
+
+.timelineContent {
+  position: relative;
+  display: flex;
+  gap: 1rem;
+}
+
+.timelineIcon {
+  flex-shrink: 0;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.timelineIcon svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.timelineIcon.create {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+}
+
+.timelineIcon.update {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+}
+
+.timelineIcon.delete {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+}
+
+.timelineIcon.restore {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+}
+
+.timelineIcon.default {
+  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+  color: white;
+}
+
+.timelineDetails {
+  flex: 1;
+  padding-top: 0.375rem;
+}
+
+.timelineText {
+  font-size: 0.875rem;
+  color: #111827;
+  line-height: 1.5;
+  margin-bottom: 0.25rem;
+}
+
+.timelineText strong {
+  font-weight: 600;
+}
+
+.timelineDetailsText {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+  line-height: 1.4;
+}
+
+.timelineTimestamp {
+  font-size: 0.875rem;
+  color: #6b7280;
+  white-space: nowrap;
+  text-align: right;
+  padding-top: 0.375rem;
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid #e5e7eb;
+  background-color: white;
+  padding: 1rem 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.paginationMobile {
+  display: flex;
+  flex: 1;
+  justify-content: space-between;
+}
+
+.paginationDesktop {
+  display: none;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.paginationInfo {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.paginationInfo strong {
+  font-weight: 600;
+  color: #111827;
+}
+
+.paginationNav {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.paginationButton {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  background-color: white;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.paginationButton:hover {
+  background-color: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.paginationButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.paginationButton.active {
+  background-color: #8b5cf6;
+  color: white;
+  border-color: #8b5cf6;
+  z-index: 10;
+}
+
+.paginationButton.active:focus {
+  outline: 2px solid #8b5cf6;
+  outline-offset: 2px;
+}
+
+.paginationButton:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+.paginationButton.roundedLeft {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.paginationButton.roundedRight {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.paginationButton.middle {
+  border-radius: 0;
+}
+
+/* Responsive Design */
+@media (min-width: 640px) {
+  .paginationMobile {
+    display: none;
+  }
+  
+  .paginationDesktop {
+    display: flex;
+  }
+}
+
+@media (max-width: 640px) {
+  .title {
+    font-size: 1.875rem;
+  }
+  
+  .statsValue {
+    font-size: 1.25rem;
+  }
+  
+  .auditHeader {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  
+  .timelineContent {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .timelineTimestamp {
+    text-align: left;
+    padding-top: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .wrapper {
+    padding: 0 0.75rem;
+  }
+  
+  .statsContent {
+    padding: 1rem;
+  }
+  
+  .auditContent {
+    padding: 1rem;
+  }
+  
+  .pagination {
+    padding: 1rem;
+  }
+} 

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import type { LoginCredentials, RegisterCredentials } from '../../types';
+import styles from './AuthForm.module.css';
 
 type AuthMode = 'login' | 'register';
 
@@ -62,52 +63,53 @@ const AuthForm: React.FC = () => {
   };
 
   return (
-    <div 
-      className="min-h-screen flex items-center justify-center px-4"
-      style={{
-        background: 'linear-gradient(135deg, #4ade80 0%, #22d3ee 100%)'
-      }}
-    >
-      <div style={{ width: '600px' }}>
+    <div className={styles.container}>
+      <div className={styles.formWrapper}>
         {/* Form Card */}
-        <div className="bg-white rounded-3xl shadow-lg px-20 py-12">
+        <div className={styles.formCard}>
           {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-2xl font-medium text-teal-600">
-              {mode === 'login' ? 'Login' : 'Sign Up'}
+          <div className={styles.header}>
+            <h1 className={styles.title}>
+              {mode === 'login' ? 'Welcome Back' : 'Create Account'}
             </h1>
+            <p className={styles.subtitle}>
+              {mode === 'login' ? 'Sign in to your account' : 'Join our community'}
+            </p>
           </div>
 
           {error && (
-            <div className="mb-6 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+            <div className={styles.error}>
+              <svg className={styles.errorIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
               {error}
             </div>
           )}
           
-          <div className="px-8">
-            <form className="space-y-6" onSubmit={handleSubmit}>
-              <div>
+          <div className={styles.formContent}>
+            <form className={styles.form} onSubmit={handleSubmit}>
+              <div className={styles.inputGroup}>
                 <input
                   id="email"
                   name="email"
                   type="email"
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-teal-400 text-gray-700 placeholder-gray-500"
-                  placeholder="Email"
+                  className={styles.input}
+                  placeholder="Enter your email"
                   value={credentials.email}
                   onChange={handleChange}
                   disabled={isLoading}
                 />
               </div>
               
-              <div>
+              <div className={styles.inputGroup}>
                 <input
                   id="password"
                   name="password"
                   type={showPassword ? "text" : "password"}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-teal-400 text-gray-700 placeholder-gray-500"
-                  placeholder="Password"
+                  className={styles.input}
+                  placeholder="Enter your password"
                   value={credentials.password}
                   onChange={handleChange}
                   disabled={isLoading}
@@ -116,29 +118,29 @@ const AuthForm: React.FC = () => {
               </div>
 
               {mode === 'login' && (
-                <div className="flex items-center text-sm">
+                <div className={styles.checkboxGroup}>
                   <input
                     id="showPassword"
                     type="checkbox"
                     checked={showPassword}
                     onChange={(e) => setShowPassword(e.target.checked)}
-                    className="h-4 w-4 text-teal-500 focus:ring-teal-400 border-gray-300 rounded"
+                    className={styles.checkbox}
                   />
-                  <label htmlFor="showPassword" className="ml-2 text-gray-600">
+                  <label htmlFor="showPassword" className={styles.checkboxLabel}>
                     Show Password
                   </label>
                 </div>
               )}
 
               {mode === 'register' && (
-                <div>
+                <div className={styles.inputGroup}>
                   <select
                     id="role"
                     name="role"
                     value={credentials.role}
                     onChange={handleChange}
                     disabled={isLoading}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-teal-400 text-gray-700"
+                    className={styles.select}
                   >
                     <option value="user">User</option>
                     <option value="admin">Admin</option>
@@ -146,49 +148,49 @@ const AuthForm: React.FC = () => {
                 </div>
               )}
 
-              <div className="pt-6">
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full bg-teal-500 hover:bg-teal-600 text-white font-semibold py-3 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-200 disabled:opacity-50 transition-colors"
-                >
-                  {isLoading ? (
-                    <span className="flex items-center justify-center">
-                      <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      {mode === 'login' ? 'SIGNING IN...' : 'CREATING ACCOUNT...'}
-                    </span>
-                  ) : (
-                    mode === 'login' ? 'SIGN IN' : 'CREATE ACCOUNT'
-                  )}
-                </button>
-              </div>
+              <button
+                type="submit"
+                disabled={isLoading}
+                className={styles.submitButton}
+              >
+                {isLoading ? (
+                  <span className={styles.loadingSpinner}>
+                    <svg className={styles.spinner} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    {mode === 'login' ? 'Signing In...' : 'Creating Account...'}
+                  </span>
+                ) : (
+                  mode === 'login' ? 'Sign In' : 'Create Account'
+                )}
+              </button>
             </form>
           </div>
 
           {/* Bottom Links */}
-          <div className="mt-8 text-center space-y-2">
+          <div className={styles.bottomLinks}>
             {mode === 'login' && (
-              <p className="text-sm text-gray-500">
-                Forgot{' '}
-                <span className="text-teal-500 hover:text-teal-600 cursor-pointer">Username</span>
-                {' / '}
-                <span className="text-teal-500 hover:text-teal-600 cursor-pointer">Password</span>
-                ?
-              </p>
+              <div className={styles.forgotLinks}>
+                <span>Forgot</span>
+                <a href="#" className={styles.forgotLink}>Username</a>
+                <span>/</span>
+                <a href="#" className={styles.forgotLink}>Password</a>
+                <span>?</span>
+              </div>
             )}
-            <p className="text-sm text-gray-500">
-              {mode === 'login' ? "Don't have an account? " : "Already have an account? "}
+            <div className={styles.switchMode}>
+              <span>
+                {mode === 'login' ? "Don't have an account? " : "Already have an account? "}
+              </span>
               <button
                 type="button"
                 onClick={toggleMode}
-                className="text-teal-500 hover:text-teal-600 font-medium"
+                className={styles.switchButton}
               >
                 {mode === 'login' ? 'Sign up' : 'Sign in'}
               </button>
-            </p>
+            </div>
           </div>
         </div>
       </div>
