@@ -43,6 +43,16 @@ export interface ProductInput {
   image_url?: string;
 }
 
+export interface PaginatedResponse<T> {
+  data: T[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
 export interface ProductsResponse {
   data: Product[];
   pagination: {
