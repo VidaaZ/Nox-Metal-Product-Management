@@ -18,7 +18,7 @@ app.use(helmet());
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:3000',
-  'https://nox-metal-frontend.onrender.com',
+  'https://nox-metal-product-management-1.onrender.com',
   process.env.FRONTEND_URL
 ].filter(Boolean);
 
