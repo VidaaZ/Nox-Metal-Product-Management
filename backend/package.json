@@ -5,12 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon --exec \"node --loader ts-node/esm\" src/index.ts",
-    "build": "tsc",
+    "build": "tsc --project tsconfig.json",
     "start": "node dist/index.js",
     "create-admin": "node --loader ts-node/esm src/scripts/createAdmin.ts",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
-    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
-    "postinstall": "npm run build"
+    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch"
   },
   "keywords": [],
   "author": "",
