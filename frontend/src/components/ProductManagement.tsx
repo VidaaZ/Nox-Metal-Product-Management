@@ -41,6 +41,7 @@ const ProductManagement: React.FC = () => {
     description: '',
     image_url: ''
   });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [formLoading, setFormLoading] = useState(false);
 
   const isAdmin = user?.role === 'admin';
@@ -52,6 +53,7 @@ const ProductManagement: React.FC = () => {
       setShowForm(true);
       setEditingProduct(null);
       setFormData({ name: '', price: 0, description: '', image_url: '' });
+      setSelectedFile(null);
     }
   }, [searchParams, isAdmin]);
 
@@ -93,15 +95,27 @@ const ProductManagement: React.FC = () => {
     try {
       setFormLoading(true);
       
+      // Create FormData for file upload
+      const formDataToSend = new FormData();
+      formDataToSend.append('name', formData.name);
+      formDataToSend.append('price', formData.price.toString());
+      if (formData.description) {
+        formDataToSend.append('description', formData.description);
+      }
+      if (selectedFile) {
+        formDataToSend.append('image', selectedFile);
+      }
+      
       if (editingProduct) {
-        await productsAPI.updateProduct(editingProduct.id, formData);
+        await productsAPI.updateProduct(editingProduct.id, formDataToSend);
       } else {
-        await productsAPI.createProduct(formData);
+        await productsAPI.createProduct(formDataToSend);
       }
       
       setShowForm(false);
       setEditingProduct(null);
       setFormData({ name: '', price: 0, description: '', image_url: '' });
+      setSelectedFile(null);
       searchParams.delete('action');
       setSearchParams(searchParams);
       await loadProducts();
@@ -147,6 +161,7 @@ const ProductManagement: React.FC = () => {
       description: product.description || '',
       image_url: product.image_url || ''
     });
+    setSelectedFile(null);
     setShowForm(true);
   };
 
@@ -245,11 +260,12 @@ const ProductManagement: React.FC = () => {
             {/* Add Product Button */}
             {isAdmin && (
               <button
-                onClick={() => {
-                  setShowForm(true);
-                  setEditingProduct(null);
-                  setFormData({ name: '', price: 0, description: '', image_url: '' });
-                }}
+                                  onClick={() => {
+                    setShowForm(true);
+                    setEditingProduct(null);
+                    setFormData({ name: '', price: 0, description: '', image_url: '' });
+                    setSelectedFile(null);
+                  }}
                 className={styles.addButton}
               >
                 <svg className={styles.addIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -305,13 +321,18 @@ const ProductManagement: React.FC = () => {
                 </div>
 
                 <div className={styles.formGroup}>
-                  <label className={styles.formLabel}>Image URL</label>
+                  <label className={styles.formLabel}>Product Image</label>
                   <input
-                    type="url"
-                    value={formData.image_url}
-                    onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
                     className={styles.formInput}
                   />
+                  {selectedFile && (
+                    <p className={styles.fileInfo}>
+                      Selected: {selectedFile.name} ({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)
+                    </p>
+                  )}
                 </div>
 
                 <div className={styles.formButtons}>
@@ -371,6 +392,7 @@ const ProductManagement: React.FC = () => {
                       setShowForm(true);
                       setEditingProduct(null);
                       setFormData({ name: '', price: 0, description: '', image_url: '' });
+                      setSelectedFile(null);
                     }}
                     className={styles.createFirstButton}
                   >

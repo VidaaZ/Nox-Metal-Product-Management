@@ -550,6 +550,13 @@
   cursor: not-allowed;
 }
 
+.fileInfo {
+  font-size: 0.875rem;
+  color: #059669;
+  margin-top: 0.25rem;
+  font-weight: 500;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .controlsRow {

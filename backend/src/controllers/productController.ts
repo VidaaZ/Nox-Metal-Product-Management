@@ -17,7 +17,6 @@ export const getProducts = async (req: any, res: Response) => {
     const offset = (Number(page) - 1) * Number(limit);
     const isAdmin = req.user?.role === 'admin';
     
-    // Only admins can view deleted products
     const showDeleted = isAdmin && String(includeDeleted) === 'true';
     
     let whereClause = showDeleted ? '' : 'WHERE is_deleted = 0';
@@ -33,7 +32,6 @@ export const getProducts = async (req: any, res: Response) => {
 
     const orderClause = `ORDER BY ${sortBy} ${sortOrder}`;
 
-    // Get total count
     const countQuery = `
       SELECT COUNT(*) as count FROM products 
       ${whereClause} ${searchClause}
@@ -46,7 +44,6 @@ export const getProducts = async (req: any, res: Response) => {
       });
     });
 
-    // Get products
     const productsQuery = `
       SELECT p.*, u.email as created_by_email 
       FROM products p
@@ -113,7 +110,7 @@ export const getProduct = async (req: any, res: Response) => {
 
 export const createProduct = async (req: any, res: Response) => {
   try {
-    const { name, price, description, image_url }: ProductInput = req.body;
+    const { name, price, description }: ProductInput = req.body;
 
     if (!name || !price) {
       return res.status(400).json({ error: 'Name and price are required' });
@@ -123,10 +120,15 @@ export const createProduct = async (req: any, res: Response) => {
       return res.status(400).json({ error: 'Price must be greater than 0' });
     }
 
+    let image_url = null;
+    if (req.file) {
+      image_url = `/uploads/${req.file.filename}`;
+    }
+
     const result = await new Promise<{ id: number }>((resolve, reject) => {
       db.run(
         'INSERT INTO products (name, price, description, image_url, created_by) VALUES (?, ?, ?, ?, ?)',
-        [name, price, description || null, image_url || null, req.user.id],
+        [name, price, description || null, image_url, req.user.id],
         function (err) {
           if (err) reject(err);
           else resolve({ id: this.lastID });
@@ -134,7 +136,6 @@ export const createProduct = async (req: any, res: Response) => {
       );
     });
 
-    // Log audit action
     await logAuditAction(
       'create',
       req.user.email,
@@ -145,7 +146,8 @@ export const createProduct = async (req: any, res: Response) => {
 
     res.status(201).json({
       message: 'Product created successfully',
-      id: result.id
+      id: result.id,
+      image_url
     });
   } catch (error) {
     console.error('Create product error:', error);
@@ -156,7 +158,7 @@ export const createProduct = async (req: any, res: Response) => {
 export const updateProduct = async (req: any, res: Response) => {
   try {
     const { id } = req.params;
-    const { name, price, description, image_url }: Partial<ProductInput> = req.body;
+    const { name, price, description }: Partial<ProductInput> = req.body;
 
     // Get existing product
     const existingProduct = await new Promise<Product | undefined>((resolve, reject) => {
@@ -193,9 +195,11 @@ export const updateProduct = async (req: any, res: Response) => {
       updates.push('description = ?');
       values.push(description);
     }
-    if (image_url !== undefined) {
+    
+    // Handle uploaded file
+    if (req.file) {
       updates.push('image_url = ?');
-      values.push(image_url);
+      values.push(`/uploads/${req.file.filename}`);
     }
 
     if (updates.length === 0) {

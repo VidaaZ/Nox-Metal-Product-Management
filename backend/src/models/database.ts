@@ -1,12 +1,11 @@
-import sqlite3 from 'sqlite3';
-import { Database } from 'sqlite3';
+import sqlite3, { Database } from 'sqlite3';
 import path from 'path';
 
 sqlite3.verbose();
 
 const dbPath = path.join(process.cwd(), 'database.sqlite');
 
-export const db: Database = new sqlite3.Database(dbPath, (err) => {
+const db: Database = new sqlite3.Database(dbPath, (err) => {
   if (err) {
     console.error('Error opening database:', err.message);
   } else {
@@ -16,7 +15,6 @@ export const db: Database = new sqlite3.Database(dbPath, (err) => {
 });
 
 function initializeTables() {
-  // Users table
   db.run(`
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -29,7 +27,6 @@ function initializeTables() {
     )
   `);
 
-  // Add full_name column to existing users table if it doesn't exist
   db.all("PRAGMA table_info(users)", (err, rows) => {
     if (!err && rows) {
       const columns = rows as any[];
@@ -41,7 +38,6 @@ function initializeTables() {
     }
   });
 
-  // Products table
   db.run(`
     CREATE TABLE IF NOT EXISTS products (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -57,7 +53,6 @@ function initializeTables() {
     )
   `);
 
-  // Audit logs table
   db.run(`
     CREATE TABLE IF NOT EXISTS audit_logs (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -74,4 +69,5 @@ function initializeTables() {
   console.log('Database tables initialized');
 }
 
+export { db };
 export default db; 

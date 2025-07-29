@@ -15,12 +15,13 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true,
 });
 
 // Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('auth_token');
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -35,8 +36,9 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    console.error('API Error:', error.response?.data || error.message);
     if (error.response?.status === 401) {
-      localStorage.removeItem('token');
+      localStorage.removeItem('auth_token');
       localStorage.removeItem('user');
       window.location.href = '/auth';
     }
@@ -79,12 +81,12 @@ export const productsAPI = {
     return response.data as Product;
   },
 
-  createProduct: async (product: { name: string; price: number; description?: string; image_url?: string }) => {
+  createProduct: async (product: FormData | { name: string; price: number; description?: string; image_url?: string }) => {
     const response = await api.post('/products', product);
     return response.data;
   },
 
-  updateProduct: async (id: number, product: Partial<{ name: string; price: number; description: string; image_url: string }>) => {
+  updateProduct: async (id: number, product: FormData | Partial<{ name: string; price: number; description: string; image_url: string }>) => {
     const response = await api.put(`/products/${id}`, product);
     return response.data;
   },

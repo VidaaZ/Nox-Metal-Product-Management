@@ -1,5 +1,6 @@
 import express from 'express';
 import { authenticateToken, requireAdmin } from '../middleware/auth.js';
+import { uploadSingle, handleUploadError } from '../middleware/upload.js';
 import { 
   getProducts, 
   getProduct, 
@@ -11,22 +12,16 @@ import {
 
 const router = express.Router();
 
-// Get products with pagination, search, and filtering
 router.get('/', authenticateToken, getProducts);
 
-// Get single product
 router.get('/:id', authenticateToken, getProduct);
 
-// Create new product (Admin only)
-router.post('/', authenticateToken, requireAdmin, createProduct);
+router.post('/', authenticateToken, requireAdmin, uploadSingle, handleUploadError, createProduct);
 
-// Update product (Admin only)
-router.put('/:id', authenticateToken, requireAdmin, updateProduct);
+router.put('/:id', authenticateToken, requireAdmin, uploadSingle, handleUploadError, updateProduct);
 
-// Delete product (Admin only) - Soft delete
 router.delete('/:id', authenticateToken, requireAdmin, deleteProduct);
 
-// Restore product (Admin only)
 router.patch('/:id/restore', authenticateToken, requireAdmin, restoreProduct);
 
 export default router; 
