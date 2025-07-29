@@ -4,6 +4,7 @@ import { AuthenticatedUser } from '../types/index.js';
 
 export interface AuthenticatedRequest extends Request {
   user?: AuthenticatedUser;
+  headers: Request['headers'];
 }
 
 export const authenticateToken = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
