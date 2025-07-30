@@ -130,7 +130,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       dispatch({ type: 'AUTH_SUCCESS', payload: userWithFullName });
     } catch (error: any) {
-      const errorMessage = error.response?.data?.error || 'Login failed';
+      console.error('Login error details:', error);
+      
+      // Handle different types of errors
+      let errorMessage = 'Login failed';
+      
+      if (error.response) {
+        // Server responded with error status
+        errorMessage = error.response.data?.error || `Login failed (${error.response.status})`;
+      } else if (error.request) {
+        // Request was made but no response received
+        errorMessage = 'Network error - please check your connection';
+      } else {
+        // Something else happened
+        errorMessage = error.message || 'Login failed';
+      }
+      
       dispatch({ type: 'AUTH_ERROR', payload: errorMessage });
       throw error;
     }
