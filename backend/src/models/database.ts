@@ -27,13 +27,21 @@ function initializeTables() {
     )
   `);
 
+  // Check if full_name column exists and add it if it doesn't (for backward compatibility)
   db.all("PRAGMA table_info(users)", (err, rows) => {
     if (!err && rows) {
       const columns = rows as any[];
       const hasFullName = columns.some(col => col.name === 'full_name');
       if (!hasFullName) {
-        db.run(`ALTER TABLE users ADD COLUMN full_name TEXT DEFAULT ''`);
-        console.log('Added full_name column to users table');
+        db.run(`ALTER TABLE users ADD COLUMN full_name TEXT DEFAULT ''`, (alterErr) => {
+          if (alterErr) {
+            console.log('full_name column already exists or could not be added:', alterErr.message);
+          } else {
+            console.log('Added full_name column to users table');
+          }
+        });
+      } else {
+        console.log('full_name column already exists in users table');
       }
     }
   });
