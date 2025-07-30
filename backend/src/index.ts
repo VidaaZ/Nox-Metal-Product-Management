@@ -45,7 +45,14 @@ app.use(express.urlencoded({ extended: true }));
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+
+// Use the same uploads directory as the upload middleware
+const uploadsDir = process.env.NODE_ENV === 'production' 
+  ? '/tmp/uploads' 
+  : path.join(process.cwd(), 'uploads');
+
+app.use('/uploads', express.static(uploadsDir));
+console.log('Static file serving from:', uploadsDir);
 
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);

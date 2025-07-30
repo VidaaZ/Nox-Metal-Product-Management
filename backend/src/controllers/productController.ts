@@ -19,13 +19,22 @@ export const getProducts = async (req: any, res: Response) => {
     
     const showDeleted = isAdmin && String(includeDeleted) === 'true';
     
-    let whereClause = showDeleted ? '' : 'WHERE is_deleted = 0';
+    let whereClause = '';
     let searchClause = '';
     let params: any[] = [];
 
+    // Build the WHERE clause based on showDeleted flag
+    if (showDeleted) {
+      // Show only deleted products
+      whereClause = 'WHERE is_deleted = 1';
+    } else {
+      // Show only active (non-deleted) products
+      whereClause = 'WHERE is_deleted = 0';
+    }
+
     if (search) {
       searchClause = showDeleted 
-        ? 'WHERE (name LIKE ? OR description LIKE ?)'
+        ? 'AND (name LIKE ? OR description LIKE ?)'
         : 'AND (name LIKE ? OR description LIKE ?)';
       params.push(`%${search}%`, `%${search}%`);
     }
@@ -122,7 +131,23 @@ export const createProduct = async (req: any, res: Response) => {
 
     let image_url = null;
     if (req.file) {
+      console.log('File uploaded:', req.file);
       image_url = `/uploads/${req.file.filename}`;
+      console.log('Image URL set to:', image_url);
+      
+      // Check if file actually exists
+      const fs = require('fs');
+      const path = require('path');
+      const filePath = path.join(process.cwd(), 'uploads', req.file.filename);
+      console.log('Full file path:', filePath);
+      console.log('File exists:', fs.existsSync(filePath));
+      
+      // List all files in uploads directory
+      const uploadsDir = path.join(process.cwd(), 'uploads');
+      if (fs.existsSync(uploadsDir)) {
+        const files = fs.readdirSync(uploadsDir);
+        console.log('Files in uploads directory:', files);
+      }
     }
 
     const result = await new Promise<{ id: number }>((resolve, reject) => {
@@ -198,8 +223,24 @@ export const updateProduct = async (req: any, res: Response) => {
     
     // Handle uploaded file
     if (req.file) {
+      console.log('File uploaded in update:', req.file);
       updates.push('image_url = ?');
       values.push(`/uploads/${req.file.filename}`);
+      console.log('Image URL updated to:', `/uploads/${req.file.filename}`);
+      
+      // Check if file actually exists
+      const fs = require('fs');
+      const path = require('path');
+      const filePath = path.join(process.cwd(), 'uploads', req.file.filename);
+      console.log('Full file path:', filePath);
+      console.log('File exists:', fs.existsSync(filePath));
+      
+      // List all files in uploads directory
+      const uploadsDir = path.join(process.cwd(), 'uploads');
+      if (fs.existsSync(uploadsDir)) {
+        const files = fs.readdirSync(uploadsDir);
+        console.log('Files in uploads directory:', files);
+      }
     }
 
     if (updates.length === 0) {

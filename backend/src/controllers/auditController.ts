@@ -4,6 +4,9 @@ import { PaginatedResponse, AuditLog } from '../types/index.js';
 
 export const getLogs = async (req: any, res: Response) => {
   try {
+    console.log('Audit logs request received:', req.query);
+    console.log('User:', req.user);
+    
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 20;
 
@@ -13,7 +16,9 @@ export const getLogs = async (req: any, res: Response) => {
       });
     }
 
+    console.log('Fetching audit logs with page:', page, 'limit:', limit);
     const { logs, total } = await getAuditLogs(page, limit);
+    console.log('Audit logs fetched:', { logs: logs.length, total });
 
     const response: PaginatedResponse<AuditLog> = {
       data: logs,
@@ -25,6 +30,7 @@ export const getLogs = async (req: any, res: Response) => {
       }
     };
 
+    console.log('Sending audit logs response:', response);
     res.json(response);
   } catch (error) {
     console.error('Get audit logs error:', error);

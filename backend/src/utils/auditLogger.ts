@@ -32,15 +32,19 @@ export const getAuditLogs = async (
 ): Promise<{ logs: AuditLog[], total: number }> => {
   const offset = (page - 1) * limit;
   
+  console.log('Getting audit logs with offset:', offset, 'limit:', limit);
+  
   return new Promise((resolve, reject) => {
     // Get total count
     db.get('SELECT COUNT(*) as count FROM audit_logs', [], (err, countRow: any) => {
       if (err) {
+        console.error('Error getting audit logs count:', err);
         reject(err);
         return;
       }
       
       const total = countRow.count;
+      console.log('Total audit logs in database:', total);
       
       // Get paginated logs
       db.all(
@@ -50,8 +54,10 @@ export const getAuditLogs = async (
         [limit, offset],
         (err, rows: AuditLog[]) => {
           if (err) {
+            console.error('Error getting audit logs:', err);
             reject(err);
           } else {
+            console.log('Retrieved audit logs:', rows.length);
             resolve({ logs: rows, total });
           }
         }

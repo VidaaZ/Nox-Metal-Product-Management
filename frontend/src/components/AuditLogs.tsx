@@ -22,7 +22,7 @@ const AuditLogs: React.FC = () => {
       setLoading(true);
       setError(null);
       
-      const response = await auditAPI.getLogs(currentPage, 20);
+      const response = await auditAPI.getLogs({ page: currentPage, limit: 20 });
       setLogs(response.data);
       setTotalPages(response.pagination.totalPages);
       setTotalLogs(response.pagination.total);

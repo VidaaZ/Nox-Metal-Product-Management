@@ -73,6 +73,7 @@ const ProductManagement: React.FC = () => {
       };
 
       const response = await productsAPI.getProducts(query);
+      console.log('Products response:', response);
       setProducts(response.data);
       setTotalPages(response.pagination.totalPages);
       setTotalProducts(response.pagination.total);
@@ -103,7 +104,13 @@ const ProductManagement: React.FC = () => {
         formDataToSend.append('description', formData.description);
       }
       if (selectedFile) {
+        console.log('Uploading file:', selectedFile.name, selectedFile.size);
         formDataToSend.append('image', selectedFile);
+      }
+      
+      console.log('FormData contents:');
+      for (let [key, value] of formDataToSend.entries()) {
+        console.log(key, value);
       }
       
       if (editingProduct) {
@@ -442,17 +449,28 @@ const ProductManagement: React.FC = () => {
                           </div>
                         </div>
 
-                        <div className={styles.productActions}>
-                          {product.image_url && (
-                            <img
-                              src={product.image_url}
-                              alt={product.name}
-                              className={styles.productImage}
-                              onError={(e) => {
-                                e.currentTarget.style.display = 'none';
-                              }}
-                            />
-                          )}
+                                                 <div className={styles.productActions}>
+                           {product.image_url && (
+                             <>
+                               {console.log('Product image URL:', product.image_url)}
+                               <img
+                                 src={product.image_url.startsWith('http') 
+                                   ? product.image_url 
+                                   : `https://nox-metal-product-management.onrender.com${product.image_url}`
+                                 }
+                                 alt={product.name}
+                                 className={styles.productImage}
+                                 onError={(e) => {
+                                   console.error('Image failed to load:', product.image_url);
+                                   console.error('Attempted URL:', e.currentTarget.src);
+                                   e.currentTarget.style.display = 'none';
+                                 }}
+                                 onLoad={() => {
+                                   console.log('Image loaded successfully:', product.image_url);
+                                 }}
+                               />
+                             </>
+                           )}
 
                           {isAdmin && (
                             <div className={styles.actionButtons}>
