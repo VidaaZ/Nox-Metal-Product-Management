@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: nox-metal-backend
+    name: nox-metal-product-management
     env: node
     plan: starter
     buildCommand: cd backend && npm install && npm run build
@@ -13,14 +13,14 @@ services:
       - key: JWT_SECRET
         generateValue: true
       - key: FRONTEND_URL
-        value: https://nox-metal-frontend.onrender.com
+        value: https://nox-metal-product-management-1.onrender.com
 
   - type: web
-    name: nox-metal-frontend
+    name: nox-metal-product-management-1
     env: static
     plan: starter
     buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: frontend/dist
     envVars:
       - key: VITE_API_URL
-        value: https://nox-metal-backend.onrender.com/api 
+        value: https://nox-metal-product-management.onrender.com/api 
