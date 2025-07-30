@@ -150,10 +150,15 @@ export const createProduct = async (req: any, res: Response) => {
       }
     }
 
+    // Get current time in Canada timezone
+    const now = new Date();
+    const canadaTime = new Date(now.toLocaleString("en-US", {timeZone: "America/Toronto"}));
+    const timestamp = canadaTime.toISOString();
+
     const result = await new Promise<{ id: number }>((resolve, reject) => {
       db.run(
-        'INSERT INTO products (name, price, description, image_url, created_by) VALUES (?, ?, ?, ?, ?)',
-        [name, price, description || null, image_url, req.user.id],
+        'INSERT INTO products (name, price, description, image_url, created_by, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        [name, price, description || null, image_url, req.user.id, timestamp, timestamp],
         function (err) {
           if (err) reject(err);
           else resolve({ id: this.lastID });
@@ -247,7 +252,13 @@ export const updateProduct = async (req: any, res: Response) => {
       return res.status(400).json({ error: 'No fields to update' });
     }
 
-    updates.push('updated_at = CURRENT_TIMESTAMP');
+    // Get current time in Canada timezone
+    const now = new Date();
+    const canadaTime = new Date(now.toLocaleString("en-US", {timeZone: "America/Toronto"}));
+    const timestamp = canadaTime.toISOString();
+
+    updates.push('updated_at = ?');
+    values.push(timestamp);
     values.push(id);
 
     await new Promise<void>((resolve, reject) => {
@@ -297,10 +308,15 @@ export const deleteProduct = async (req: any, res: Response) => {
       return res.status(400).json({ error: 'Product is already deleted' });
     }
 
+    // Get current time in Canada timezone
+    const now = new Date();
+    const canadaTime = new Date(now.toLocaleString("en-US", {timeZone: "America/Toronto"}));
+    const timestamp = canadaTime.toISOString();
+
     await new Promise<void>((resolve, reject) => {
       db.run(
-        'UPDATE products SET is_deleted = 1, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
-        [id],
+        'UPDATE products SET is_deleted = 1, updated_at = ? WHERE id = ?',
+        [timestamp, id],
         function (err) {
           if (err) reject(err);
           else resolve();
@@ -344,10 +360,15 @@ export const restoreProduct = async (req: any, res: Response) => {
       return res.status(400).json({ error: 'Product is not deleted' });
     }
 
+    // Get current time in Canada timezone
+    const now = new Date();
+    const canadaTime = new Date(now.toLocaleString("en-US", {timeZone: "America/Toronto"}));
+    const timestamp = canadaTime.toISOString();
+
     await new Promise<void>((resolve, reject) => {
       db.run(
-        'UPDATE products SET is_deleted = 0, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
-        [id],
+        'UPDATE products SET is_deleted = 0, updated_at = ? WHERE id = ?',
+        [timestamp, id],
         function (err) {
           if (err) reject(err);
           else resolve();

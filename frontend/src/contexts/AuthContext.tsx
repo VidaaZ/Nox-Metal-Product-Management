@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import React, { createContext, useContext, useReducer, useEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
 import type { User, LoginCredentials, RegisterCredentials } from '../types';
 import { authAPI } from '../lib/api';
@@ -89,24 +89,41 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
+  const hasCheckedAuth = useRef(false);
 
   // Check if user is logged in on app start
   useEffect(() => {
+    if (hasCheckedAuth.current) return;
+    hasCheckedAuth.current = true;
+
     const checkAuth = async () => {
       const token = localStorage.getItem('auth_token');
       const storedUser = localStorage.getItem('user');
+
+      console.log('AuthContext: Checking authentication...', { token: !!token, storedUser: !!storedUser });
 
       if (token && storedUser) {
         try {
           dispatch({ type: 'AUTH_START' });
           const { user } = await authAPI.getProfile();
+          console.log('AuthContext: Profile check successful', user);
           dispatch({ type: 'AUTH_SUCCESS', payload: user });
         } catch (error) {
-          // Token is invalid, clean up
-          localStorage.removeItem('auth_token');
-          localStorage.removeItem('user');
-          dispatch({ type: 'AUTH_ERROR', payload: 'Session expired' });
+          console.error('AuthContext: Profile check failed', error);
+          // Don't immediately clear on error - use stored user data as fallback
+          try {
+            const parsedUser = JSON.parse(storedUser);
+            console.log('AuthContext: Using stored user data as fallback', parsedUser);
+            dispatch({ type: 'AUTH_SUCCESS', payload: parsedUser });
+          } catch (parseError) {
+            // Only clear if we can't parse the stored user
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('user');
+            dispatch({ type: 'AUTH_ERROR', payload: 'Session expired' });
+          }
         }
+      } else {
+        console.log('AuthContext: No token or stored user found');
       }
     };
 

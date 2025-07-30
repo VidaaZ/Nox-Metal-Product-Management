@@ -9,10 +9,15 @@ export const logAuditAction = async (
   details?: string
 ): Promise<void> => {
   return new Promise((resolve, reject) => {
+    // Get current time in Canada timezone
+    const now = new Date();
+    const canadaTime = new Date(now.toLocaleString("en-US", {timeZone: "America/Toronto"}));
+    const timestamp = canadaTime.toISOString();
+    
     db.run(
-      `INSERT INTO audit_logs (action, user_email, product_id, product_name, details) 
-       VALUES (?, ?, ?, ?, ?)`,
-      [action, userEmail, productId, productName, details],
+      `INSERT INTO audit_logs (action, user_email, product_id, product_name, details, timestamp) 
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [action, userEmail, productId, productName, details, timestamp],
       function (err) {
         if (err) {
           console.error('Audit log error:', err);

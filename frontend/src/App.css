@@ -18,6 +18,7 @@ body {
 .bg-green-50 { background-color: #f0fdf4; }
 .bg-blue-50 { background-color: #eff6ff; }
 .bg-red-50 { background-color: #fef2f2; }
+.bg-red-100 { background-color: #fee2e2; }
 
 /* Gradient backgrounds */
 .bg-gradient-to-br { background-image: linear-gradient(to bottom right, var(--tw-gradient-stops)); }
@@ -92,6 +93,7 @@ body {
 .text-blue-700 { color: #1d4ed8; }
 .text-blue-600 { color: #2563eb; }
 .text-red-700 { color: #b91c1c; }
+.text-red-600 { color: #dc2626; }
 .text-red-500 { color: #ef4444; }
 .text-red-400 { color: #f87171; }
 .text-white { color: white; }

@@ -55,8 +55,8 @@ function initializeTables() {
       image_url TEXT,
       is_deleted BOOLEAN DEFAULT 0,
       created_by INTEGER,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      created_at DATETIME,
+      updated_at DATETIME,
       FOREIGN KEY (created_by) REFERENCES users (id)
     )
   `);
@@ -69,7 +69,7 @@ function initializeTables() {
       product_id INTEGER,
       product_name TEXT,
       details TEXT,
-      timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+      timestamp DATETIME,
       FOREIGN KEY (product_id) REFERENCES products (id)
     )
   `);
