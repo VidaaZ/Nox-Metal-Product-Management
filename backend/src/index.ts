@@ -20,6 +20,8 @@ const allowedOrigins = [
   'http://localhost:3000',
   'https://nox-metal-product-management.vercel.app',
   'https://nox-metal-product-management.vercel.app/',
+  'https://nox-metal-product-management-git-main-vidas-projects-f4001eed.vercel.app',
+  'https://nox-metal-product-management-rfz6t79uh-vidas-projects-f4001eed.vercel.app',
   process.env.FRONTEND_URL
 ].filter(Boolean);
 
@@ -34,13 +36,18 @@ app.use(cors({
     console.log('CORS check for origin:', origin);
     console.log('Allowed origins:', allowedOrigins);
     
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      console.log('CORS: Allowing origin:', origin);
-      callback(null, true);
-    } else {
-      console.log('CORS blocked origin:', origin);
-      callback(new Error('Not allowed by CORS'));
-    }
+    // Temporarily allow all origins for debugging
+    console.log('CORS: Allowing all origins for debugging');
+    callback(null, true);
+    
+    // Original logic (commented out for debugging):
+    // if (allowedOrigins.indexOf(origin) !== -1) {
+    //   console.log('CORS: Allowing origin:', origin);
+    //   callback(null, true);
+    // } else {
+    //   console.log('CORS blocked origin:', origin);
+    //   callback(new Error('Not allowed by CORS'));
+    // }
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
