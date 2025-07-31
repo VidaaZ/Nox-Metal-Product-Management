@@ -7,8 +7,8 @@ import type {
   AuditLog 
 } from '../types';
 
-// API base URL - use environment variable or default to Railway backend
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://nox-metal-product-management-production.up.railway.app/api';
+// API base URL - use environment variable or default to localhost for development
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
 console.log('API Base URL:', API_BASE_URL);
 console.log('Environment:', import.meta.env.MODE);
@@ -68,23 +68,17 @@ api.interceptors.response.use(
 
 export const authAPI = {
   login: async (credentials: { email: string; password: string }) => {
-    console.log('Attempting login for:', credentials.email);
     const response = await api.post('/auth/login', credentials);
-    console.log('Login successful for:', credentials.email);
     return response.data as AuthResponse;
   },
 
   register: async (credentials: { email: string; full_name: string; password: string; role?: string }) => {
-    console.log('Attempting registration for:', credentials.email);
     const response = await api.post('/auth/register', credentials);
-    console.log('Registration successful for:', credentials.email);
     return response.data as AuthResponse;
   },
 
   getProfile: async () => {
-    console.log('Fetching user profile');
     const response = await api.get('/auth/profile');
-    console.log('Profile fetch successful');
     return response.data as { user: User };
   },
 };

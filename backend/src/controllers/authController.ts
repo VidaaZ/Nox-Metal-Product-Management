@@ -28,15 +28,12 @@ export const getProfile = async (req: any, res: Response) => {
 
 export const register = async (req: Request, res: Response) => {
   try {
-    console.log('Registration attempt with body:', req.body);
     const { email, full_name, password, role = 'user' }: UserInput = req.body;
 
     if (!email || !full_name || !password) {
-      console.log('Registration failed: missing required fields');
       return res.status(400).json({ error: 'Email, full name, and password are required' });
     }
 
-    console.log('Calling authService.register with:', { email, full_name, role });
     const { user, token } = await authService.register(email, password, full_name);
 
     const authenticatedUser: AuthenticatedUser = {
@@ -46,15 +43,13 @@ export const register = async (req: Request, res: Response) => {
       role: user.role
     };
 
-    console.log('Registration successful for:', email);
     res.status(201).json({
       message: 'User created successfully',
       user: authenticatedUser,
       token
     });
   } catch (error) {
-    console.error('Registration error details:', error);
-    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+    console.error('Registration error:', error);
     if (error instanceof Error && error.message === 'User already exists') {
       return res.status(400).json({ error: 'User already exists' });
     }
@@ -66,10 +61,7 @@ export const login = async (req: Request, res: Response) => {
   try {
     const { email, password }: LoginInput = req.body;
 
-    console.log('Login attempt for email:', email);
-
     if (!email || !password) {
-      console.log('Login failed: missing email or password');
       return res.status(400).json({ error: 'Email and password are required' });
     }
 
@@ -81,8 +73,6 @@ export const login = async (req: Request, res: Response) => {
       full_name: user.full_name,
       role: user.role
     };
-
-    console.log('Login successful for:', email);
 
     res.json({
       message: 'Login successful',
