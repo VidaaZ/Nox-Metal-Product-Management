@@ -1,20 +1,28 @@
-import sqlite3, { Database } from 'sqlite3';
-import path from 'path';
+import sqlite3 from 'sqlite3';
 
-sqlite3.verbose();
 
-const dbPath = path.join(process.cwd(), 'database.sqlite');
+const dbPath = process.env.NODE_ENV === 'production' 
+  ? '/tmp/database.sqlite' 
+  : './database.sqlite';
 
-const db: Database = new sqlite3.Database(dbPath, (err) => {
+console.log('Database path:', dbPath);
+
+
+const db = new sqlite3.Database(dbPath, (err) => {
   if (err) {
-    console.error('Error opening database:', err.message);
+    console.error('❌ Error opening database:', err.message);
   } else {
-    console.log('Connected to SQLite database');
-    initializeTables();
+    console.log('✅ Connected to SQLite database');
   }
 });
 
-function initializeTables() {
+
+db.run('PRAGMA foreign_keys = ON');
+
+const initializeDatabase = () => {
+  console.log('Database tables initialized');
+  
+
   db.run(`
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -27,24 +35,6 @@ function initializeTables() {
     )
   `);
 
-  // Check if full_name column exists and add it if it doesn't (for backward compatibility)
-  db.all("PRAGMA table_info(users)", (err, rows) => {
-    if (!err && rows) {
-      const columns = rows as any[];
-      const hasFullName = columns.some(col => col.name === 'full_name');
-      if (!hasFullName) {
-        db.run(`ALTER TABLE users ADD COLUMN full_name TEXT DEFAULT ''`, (alterErr) => {
-          if (alterErr) {
-            console.log('full_name column already exists or could not be added:', alterErr.message);
-          } else {
-            console.log('Added full_name column to users table');
-          }
-        });
-      } else {
-        console.log('full_name column already exists in users table');
-      }
-    }
-  });
 
   db.run(`
     CREATE TABLE IF NOT EXISTS products (
@@ -52,15 +42,15 @@ function initializeTables() {
       name TEXT NOT NULL,
       price REAL NOT NULL,
       description TEXT,
-      image_url TEXT,
-      is_deleted BOOLEAN DEFAULT 0,
+      is_deleted INTEGER DEFAULT 0,
       created_by INTEGER,
-      created_at DATETIME,
-      updated_at DATETIME,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (created_by) REFERENCES users (id)
     )
   `);
 
+  
   db.run(`
     CREATE TABLE IF NOT EXISTS audit_logs (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -69,13 +59,27 @@ function initializeTables() {
       product_id INTEGER,
       product_name TEXT,
       details TEXT,
-      timestamp DATETIME,
+      timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (product_id) REFERENCES products (id)
     )
   `);
 
-  console.log('Database tables initialized');
-}
+  
+  db.all("PRAGMA table_info(users)", (err, rows: any) => {
+    if (!err && rows) {
+      const hasFullName = rows.some((row: any) => row.name === 'full_name');
+      if (!hasFullName) {
+        db.run('ALTER TABLE users ADD COLUMN full_name TEXT NOT NULL DEFAULT ""');
+        console.log('Added full_name column to users table');
+      } else {
+        console.log('full_name column already exists in users table');
+      }
+    }
+  });
+};
+
+
+initializeDatabase();
 
 export { db };
 export default db; 

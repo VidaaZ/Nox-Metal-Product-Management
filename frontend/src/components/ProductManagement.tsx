@@ -38,10 +38,8 @@ const ProductManagement: React.FC = () => {
   const [formData, setFormData] = useState<ProductInput>({
     name: '',
     price: 0,
-    description: '',
-    image_url: ''
+    description: ''
   });
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [formLoading, setFormLoading] = useState(false);
 
   const isAdmin = user?.role === 'admin';
@@ -52,8 +50,7 @@ const ProductManagement: React.FC = () => {
     if (action === 'create' && isAdmin) {
       setShowForm(true);
       setEditingProduct(null);
-      setFormData({ name: '', price: 0, description: '', image_url: '' });
-      setSelectedFile(null);
+      setFormData({ name: '', price: 0, description: '' });
     }
   }, [searchParams, isAdmin]);
 
@@ -96,33 +93,15 @@ const ProductManagement: React.FC = () => {
     try {
       setFormLoading(true);
       
-      // Create FormData for file upload
-      const formDataToSend = new FormData();
-      formDataToSend.append('name', formData.name);
-      formDataToSend.append('price', formData.price.toString());
-      if (formData.description) {
-        formDataToSend.append('description', formData.description);
-      }
-      if (selectedFile) {
-        console.log('Uploading file:', selectedFile.name, selectedFile.size);
-        formDataToSend.append('image', selectedFile);
-      }
-      
-      console.log('FormData contents:');
-      for (let [key, value] of formDataToSend.entries()) {
-        console.log(key, value);
-      }
-      
       if (editingProduct) {
-        await productsAPI.updateProduct(editingProduct.id, formDataToSend);
+        await productsAPI.updateProduct(editingProduct.id, formData);
       } else {
-        await productsAPI.createProduct(formDataToSend);
+        await productsAPI.createProduct(formData);
       }
       
       setShowForm(false);
       setEditingProduct(null);
-      setFormData({ name: '', price: 0, description: '', image_url: '' });
-      setSelectedFile(null);
+      setFormData({ name: '', price: 0, description: '' });
       searchParams.delete('action');
       setSearchParams(searchParams);
       await loadProducts();
@@ -165,10 +144,8 @@ const ProductManagement: React.FC = () => {
     setFormData({
       name: product.name,
       price: product.price,
-      description: product.description || '',
-      image_url: product.image_url || ''
+      description: product.description || ''
     });
-    setSelectedFile(null);
     setShowForm(true);
   };
 
@@ -271,8 +248,7 @@ const ProductManagement: React.FC = () => {
                                   onClick={() => {
                     setShowForm(true);
                     setEditingProduct(null);
-                    setFormData({ name: '', price: 0, description: '', image_url: '' });
-                    setSelectedFile(null);
+                                          setFormData({ name: '', price: 0, description: '' });
                   }}
                 className={styles.addButton}
               >
@@ -328,20 +304,7 @@ const ProductManagement: React.FC = () => {
                   />
                 </div>
 
-                <div className={styles.formGroup}>
-                  <label className={styles.formLabel}>Product Image</label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
-                    className={styles.formInput}
-                  />
-                  {selectedFile && (
-                    <p className={styles.fileInfo}>
-                      Selected: {selectedFile.name} ({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)
-                    </p>
-                  )}
-                </div>
+
 
                 <div className={styles.formButtons}>
                   <button
@@ -399,8 +362,7 @@ const ProductManagement: React.FC = () => {
                     onClick={() => {
                       setShowForm(true);
                       setEditingProduct(null);
-                      setFormData({ name: '', price: 0, description: '', image_url: '' });
-                      setSelectedFile(null);
+                      setFormData({ name: '', price: 0, description: '' });
                     }}
                     className={styles.createFirstButton}
                   >
@@ -451,28 +413,6 @@ const ProductManagement: React.FC = () => {
                         </div>
 
                                                  <div className={styles.productActions}>
-                           {product.image_url && (
-                             <>
-                               {console.log('Product image URL:', product.image_url)}
-                               <img
-                                 src={product.image_url.startsWith('http') 
-                                   ? product.image_url 
-                                   : `https://nox-metal-product-management.onrender.com${product.image_url}`
-                                 }
-                                 alt={product.name}
-                                 className={styles.productImage}
-                                 onError={(e) => {
-                                   console.error('Image failed to load:', product.image_url);
-                                   console.error('Attempted URL:', e.currentTarget.src);
-                                   e.currentTarget.style.display = 'none';
-                                 }}
-                                 onLoad={() => {
-                                   console.log('Image loaded successfully:', product.image_url);
-                                 }}
-                               />
-                             </>
-                           )}
-
                           {isAdmin && (
                             <div className={styles.actionButtons}>
                               {!product.is_deleted ? (

@@ -7,8 +7,11 @@ import type {
   AuditLog 
 } from '../types';
 
-// API base URL - use environment variable in production
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://nox-metal-product-management.onrender.com/api';
+// API base URL - use environment variable or default to localhost for development
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+
+console.log('API Base URL:', API_BASE_URL);
+console.log('Environment:', import.meta.env.MODE);
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -24,17 +27,24 @@ api.interceptors.request.use(
     const token = localStorage.getItem('auth_token');
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
+      console.log('Adding auth token to request:', config.url);
+    } else {
+      console.log('No auth token found for request:', config.url);
     }
     return config;
   },
   (error) => {
+    console.error('Request interceptor error:', error);
     return Promise.reject(error);
   }
 );
 
 // Response interceptor to handle auth errors
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log('API Response:', response.config.url, response.status);
+    return response;
+  },
   (error) => {
     console.error('API Error:', {
       status: error.response?.status,
@@ -44,6 +54,7 @@ api.interceptors.response.use(
     });
     
     if (error.response?.status === 401) {
+      console.log('Unauthorized request, clearing auth data');
       localStorage.removeItem('auth_token');
       localStorage.removeItem('user');
       // Don't redirect on login errors, let the component handle it
@@ -57,17 +68,23 @@ api.interceptors.response.use(
 
 export const authAPI = {
   login: async (credentials: { email: string; password: string }) => {
+    console.log('Attempting login for:', credentials.email);
     const response = await api.post('/auth/login', credentials);
+    console.log('Login successful for:', credentials.email);
     return response.data as AuthResponse;
   },
 
   register: async (credentials: { email: string; full_name: string; password: string; role?: string }) => {
+    console.log('Attempting registration for:', credentials.email);
     const response = await api.post('/auth/register', credentials);
+    console.log('Registration successful for:', credentials.email);
     return response.data as AuthResponse;
   },
 
   getProfile: async () => {
+    console.log('Fetching user profile');
     const response = await api.get('/auth/profile');
+    console.log('Profile fetch successful');
     return response.data as { user: User };
   },
 };
@@ -90,12 +107,12 @@ export const productsAPI = {
     return response.data as Product;
   },
 
-  createProduct: async (product: FormData | { name: string; price: number; description?: string; image_url?: string }) => {
+  createProduct: async (product: { name: string; price: number; description?: string }) => {
     const response = await api.post('/products', product);
     return response.data;
   },
 
-  updateProduct: async (id: number, product: FormData | Partial<{ name: string; price: number; description: string; image_url: string }>) => {
+  updateProduct: async (id: number, product: Partial<{ name: string; price: number; description: string }>) => {
     const response = await api.put(`/products/${id}`, product);
     return response.data;
   },

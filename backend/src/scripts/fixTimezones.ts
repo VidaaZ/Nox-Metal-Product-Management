@@ -40,7 +40,7 @@ async function fixProductTimezones() {
               console.log(`Updated product ${product.id}: ${product.created_at} → ${newCreatedAt}`);
             }
             
-            // Check if all products have been processed
+    
             if (updatedCount === products.length) {
               console.log(`Successfully updated ${updatedCount} products`);
               resolve();

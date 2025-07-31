@@ -100,7 +100,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const token = localStorage.getItem('auth_token');
       const storedUser = localStorage.getItem('user');
 
-      console.log('AuthContext: Checking authentication...', { token: !!token, storedUser: !!storedUser });
+      console.log('AuthContext: Checking authentication...', { 
+        hasToken: !!token, 
+        hasStoredUser: !!storedUser,
+        tokenLength: token?.length 
+      });
 
       if (token && storedUser) {
         try {
@@ -110,20 +114,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           dispatch({ type: 'AUTH_SUCCESS', payload: user });
         } catch (error) {
           console.error('AuthContext: Profile check failed', error);
-          // Don't immediately clear on error - use stored user data as fallback
-          try {
-            const parsedUser = JSON.parse(storedUser);
-            console.log('AuthContext: Using stored user data as fallback', parsedUser);
-            dispatch({ type: 'AUTH_SUCCESS', payload: parsedUser });
-          } catch (parseError) {
-            // Only clear if we can't parse the stored user
-            localStorage.removeItem('auth_token');
-            localStorage.removeItem('user');
-            dispatch({ type: 'AUTH_ERROR', payload: 'Session expired' });
-          }
+          // Clear invalid auth data
+          localStorage.removeItem('auth_token');
+          localStorage.removeItem('user');
+          dispatch({ type: 'AUTH_ERROR', payload: 'Session expired' });
         }
       } else {
         console.log('AuthContext: No token or stored user found');
+        // Clear any partial auth data
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('user');
       }
     };
 
@@ -132,8 +132,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (credentials: LoginCredentials): Promise<void> => {
     try {
+      console.log('AuthContext: Starting login for', credentials.email);
       dispatch({ type: 'AUTH_START' });
+      
       const response = await authAPI.login(credentials);
+      console.log('AuthContext: Login API response received', response);
       
       // Ensure user has full_name field for backward compatibility
       const userWithFullName = {
@@ -141,13 +144,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         full_name: response.user.full_name || response.user.email.split('@')[0]
       };
       
-      // Store token and user
+      // Store token and user atomically
       localStorage.setItem('auth_token', response.token);
       localStorage.setItem('user', JSON.stringify(userWithFullName));
       
+      console.log('AuthContext: Login successful, stored auth data');
       dispatch({ type: 'AUTH_SUCCESS', payload: userWithFullName });
     } catch (error: any) {
-      console.error('Login error details:', error);
+      console.error('AuthContext: Login error details:', error);
       
       // Handle different types of errors
       let errorMessage = 'Login failed';
@@ -163,6 +167,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         errorMessage = error.message || 'Login failed';
       }
       
+      console.error('AuthContext: Login failed with message:', errorMessage);
       dispatch({ type: 'AUTH_ERROR', payload: errorMessage });
       throw error;
     }
@@ -170,15 +175,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const register = async (credentials: RegisterCredentials): Promise<void> => {
     try {
+      console.log('AuthContext: Starting registration for', credentials.email);
       dispatch({ type: 'AUTH_START' });
-      const response = await authAPI.register(credentials);
       
-      // Store token and user
+      const response = await authAPI.register(credentials);
+      console.log('AuthContext: Registration API response received', response);
+      
+      // Store token and user atomically
       localStorage.setItem('auth_token', response.token);
       localStorage.setItem('user', JSON.stringify(response.user));
       
+      console.log('AuthContext: Registration successful, stored auth data');
       dispatch({ type: 'AUTH_SUCCESS', payload: response.user });
     } catch (error: any) {
+      console.error('AuthContext: Registration error details:', error);
       const errorMessage = error.response?.data?.error || 'Registration failed';
       dispatch({ type: 'AUTH_ERROR', payload: errorMessage });
       throw error;
@@ -186,6 +196,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const logout = (): void => {
+    console.log('AuthContext: Logging out user');
     localStorage.removeItem('auth_token');
     localStorage.removeItem('user');
     dispatch({ type: 'AUTH_LOGOUT' });

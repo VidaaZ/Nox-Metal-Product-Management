@@ -7,6 +7,8 @@ const createAdminUser = async () => {
   const role = 'admin';
 
   try {
+    console.log('Creating admin user...');
+    
     // Check if admin already exists
     const existingAdmin = await new Promise<any>((resolve, reject) => {
       db.get('SELECT * FROM users WHERE email = ?', [email], (err, row) => {
@@ -26,8 +28,8 @@ const createAdminUser = async () => {
     // Create admin user
     await new Promise<void>((resolve, reject) => {
       db.run(
-        'INSERT INTO users (email, password, role) VALUES (?, ?, ?)',
-        [email, hashedPassword, role],
+        'INSERT INTO users (email, full_name, password, role) VALUES (?, ?, ?, ?)',
+        [email, 'Admin User', hashedPassword, role],
         function (err) {
           if (err) reject(err);
           else {

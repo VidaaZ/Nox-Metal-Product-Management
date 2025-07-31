@@ -33,9 +33,7 @@ dist-ssr
 *.db
 database.sqlite
 
-# Uploads
-backend/uploads/
-uploads/
+
 
 # Build outputs
 build/

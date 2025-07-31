@@ -1,6 +1,5 @@
 import express from 'express';
 import { authenticateToken, requireAdmin } from '../middleware/auth.js';
-import { uploadSingle, handleUploadError } from '../middleware/upload.js';
 import { 
   getProducts, 
   getProduct, 
@@ -16,9 +15,9 @@ router.get('/', authenticateToken, getProducts);
 
 router.get('/:id', authenticateToken, getProduct);
 
-router.post('/', authenticateToken, requireAdmin, uploadSingle, handleUploadError, createProduct);
+router.post('/', authenticateToken, requireAdmin, createProduct);
 
-router.put('/:id', authenticateToken, requireAdmin, uploadSingle, handleUploadError, updateProduct);
+router.put('/:id', authenticateToken, requireAdmin, updateProduct);
 
 router.delete('/:id', authenticateToken, requireAdmin, deleteProduct);
 

@@ -1,8 +1,6 @@
-import bcrypt from 'bcryptjs';
 import { Request, Response } from 'express';
-import { db } from '../models/database.js';
-import { generateToken } from '../utils/jwt.js';
-import { UserInput, LoginInput, User, AuthenticatedUser } from '../types/index.js';
+import { authService } from '../services/authService.js';
+import { UserInput, LoginInput, AuthenticatedUser } from '../types/index.js';
 
 export const getProfile = async (req: any, res: Response) => {
   try {
@@ -12,17 +10,7 @@ export const getProfile = async (req: any, res: Response) => {
       return res.status(401).json({ error: 'User not authenticated' });
     }
 
-    // Get user from database
-    const user = await new Promise<User | undefined>((resolve, reject) => {
-      db.get('SELECT * FROM users WHERE id = ?', [userId], (err, row: User) => {
-        if (err) reject(err);
-        else resolve(row);
-      });
-    });
-
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
+    const user = await authService.getProfile(userId);
 
     const authenticatedUser: AuthenticatedUser = {
       id: user.id,
@@ -46,80 +34,7 @@ export const register = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Email, full name, and password are required' });
     }
 
-    // Check if user already exists
-    const existingUser = await new Promise<User | undefined>((resolve, reject) => {
-      db.get('SELECT * FROM users WHERE email = ?', [email], (err, row: User) => {
-        if (err) reject(err);
-        else resolve(row);
-      });
-    });
-
-    if (existingUser) {
-      return res.status(400).json({ error: 'User already exists' });
-    }
-
-    // Hash password
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
-
-    // Insert user
-    const result = await new Promise<{ id: number }>((resolve, reject) => {
-      db.run(
-        'INSERT INTO users (email, full_name, password, role) VALUES (?, ?, ?, ?)',
-        [email, full_name, hashedPassword, role],
-        function (err) {
-          if (err) reject(err);
-          else resolve({ id: this.lastID });
-        }
-      );
-    });
-
-    const user: AuthenticatedUser = {
-      id: result.id,
-      email,
-      full_name,
-      role: role as 'admin' | 'user'
-    };
-
-    const token = generateToken(user);
-
-    res.status(201).json({
-      message: 'User created successfully',
-      user,
-      token
-    });
-  } catch (error) {
-    console.error('Registration error:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-};
-
-export const login = async (req: Request, res: Response) => {
-  try {
-    const { email, password }: LoginInput = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required' });
-    }
-
-    // Find user
-    const user = await new Promise<User | undefined>((resolve, reject) => {
-      db.get('SELECT * FROM users WHERE email = ?', [email], (err, row: User) => {
-        if (err) reject(err);
-        else resolve(row);
-      });
-    });
-
-    if (!user) {
-      return res.status(401).json({ error: 'Invalid credentials' });
-    }
-
-    // Check password
-    const isValidPassword = await bcrypt.compare(password, user.password);
-
-    if (!isValidPassword) {
-      return res.status(401).json({ error: 'Invalid credentials' });
-    }
+    const { user, token } = await authService.register(email, password, full_name);
 
     const authenticatedUser: AuthenticatedUser = {
       id: user.id,
@@ -128,7 +43,41 @@ export const login = async (req: Request, res: Response) => {
       role: user.role
     };
 
-    const token = generateToken(authenticatedUser);
+    res.status(201).json({
+      message: 'User created successfully',
+      user: authenticatedUser,
+      token
+    });
+  } catch (error) {
+    console.error('Registration error:', error);
+    if (error instanceof Error && error.message === 'User already exists') {
+      return res.status(400).json({ error: 'User already exists' });
+    }
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const login = async (req: Request, res: Response) => {
+  try {
+    const { email, password }: LoginInput = req.body;
+
+    console.log('Login attempt for email:', email);
+
+    if (!email || !password) {
+      console.log('Login failed: missing email or password');
+      return res.status(400).json({ error: 'Email and password are required' });
+    }
+
+    const { user, token } = await authService.login(email, password);
+
+    const authenticatedUser: AuthenticatedUser = {
+      id: user.id,
+      email: user.email,
+      full_name: user.full_name,
+      role: user.role
+    };
+
+    console.log('Login successful for:', email);
 
     res.json({
       message: 'Login successful',
@@ -137,6 +86,20 @@ export const login = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error('Login error:', error);
+    if (error instanceof Error && error.message === 'Invalid credentials') {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const getUsers = async (req: any, res: Response) => {
+  try {
+    const users = await authService.getAllUsers();
+
+    res.json({ users });
+  } catch (error) {
+    console.error('Get users error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 }; 

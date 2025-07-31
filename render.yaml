@@ -12,6 +12,8 @@ services:
         value: 10000
       - key: JWT_SECRET
         generateValue: true
+      - key: FRONTEND_URL
+        value: https://nox-metal-product-management-1.onrender.com
 
   - type: web
     name: nox-metal-product-management-1

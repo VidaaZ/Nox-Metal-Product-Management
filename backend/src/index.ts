@@ -51,13 +51,7 @@ app.use(express.urlencoded({ extended: true }));
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Use the same uploads directory as the upload middleware
-const uploadsDir = process.env.NODE_ENV === 'production' 
-  ? '/tmp/uploads' 
-  : path.join(process.cwd(), 'uploads');
 
-app.use('/uploads', express.static(uploadsDir));
-console.log('Static file serving from:', uploadsDir);
 
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
@@ -79,4 +73,14 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  
+  // Auto-create admin user in production
+  if (process.env.NODE_ENV === 'production') {
+    console.log('Production environment detected - auto-creating admin user...');
+    import('./scripts/createAdmin.js').then(() => {
+      console.log('Admin user creation script completed');
+    }).catch(error => {
+      console.error('Error running admin creation script:', error);
+    });
+  }
 }); 
