@@ -9,6 +9,9 @@ const createAdminUser = async () => {
   try {
     console.log('Creating admin user...');
     
+    // Wait a moment for database initialization
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
     // Check if admin already exists
     const existingAdmin = await new Promise<any>((resolve, reject) => {
       db.get('SELECT * FROM users WHERE email = ?', [email], (err, row) => {
