@@ -19,18 +19,23 @@ const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:3000',
   'https://nox-metal-product-management.vercel.app',
+  'https://nox-metal-product-management.vercel.app/',
   process.env.FRONTEND_URL
 ].filter(Boolean);
 
 app.use(cors({
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
+    if (!origin) {
+      console.log('CORS: Allowing request with no origin');
+      return callback(null, true);
+    }
     
     console.log('CORS check for origin:', origin);
     console.log('Allowed origins:', allowedOrigins);
     
     if (allowedOrigins.indexOf(origin) !== -1) {
+      console.log('CORS: Allowing origin:', origin);
       callback(null, true);
     } else {
       console.log('CORS blocked origin:', origin);
@@ -56,6 +61,11 @@ app.use('/api/audit', auditRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
+});
+
+app.get('/api/test', (req, res) => {
+  console.log('Test endpoint hit from origin:', req.headers.origin);
+  res.json({ message: 'CORS test successful', origin: req.headers.origin });
 });
 
 app.use((req, res) => {
