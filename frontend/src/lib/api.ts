@@ -7,8 +7,8 @@ import type {
   AuditLog 
 } from '../types';
 
-// API base URL - use environment variable or default to localhost for development
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+// API base URL - use environment variable or default to Railway backend
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://nox-metal-product-management-production.up.railway.app/api';
 
 console.log('API Base URL:', API_BASE_URL);
 console.log('Environment:', import.meta.env.MODE);
