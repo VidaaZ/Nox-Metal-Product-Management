@@ -14,12 +14,10 @@ const PORT = process.env.PORT || 3001;
 
 app.use(helmet());
 
-// CORS configuration for production
+// CORS configuration
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:3000',
-  'https://nox-metal-product-management-1.onrender.com',
-  'https://nox-metal-product-management.onrender.com',
   process.env.FRONTEND_URL
 ].filter(Boolean);
 
@@ -50,8 +48,6 @@ app.use(express.urlencoded({ extended: true }));
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-
 
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);

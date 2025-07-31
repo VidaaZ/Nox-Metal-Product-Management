@@ -13,10 +13,13 @@ const AuthForm: React.FC = () => {
   
   const [mode, setMode] = useState<AuthMode>('login');
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [passwordError, setPasswordError] = useState('');
   const [credentials, setCredentials] = useState({
     email: '',
     full_name: '',
     password: '',
+    confirmPassword: '',
     role: 'user' as 'user' | 'admin'
   });
 
@@ -24,6 +27,16 @@ const AuthForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Clear previous password error
+    setPasswordError('');
+    
+    // Validate password confirmation for registration
+    if (mode === 'register' && credentials.password !== credentials.confirmPassword) {
+      setPasswordError('Passwords do not match');
+      return;
+    }
+    
     try {
       if (mode === 'login') {
         const loginData: LoginCredentials = {
@@ -52,15 +65,22 @@ const AuthForm: React.FC = () => {
       ...prev,
       [name]: value
     }));
+    
+    // Clear password error when user starts typing
+    if (name === 'password' || name === 'confirmPassword') {
+      setPasswordError('');
+    }
   };
 
   const toggleMode = () => {
     setMode(mode === 'login' ? 'register' : 'login');
     // Clear any existing errors when switching modes
+    setPasswordError('');
     setCredentials({
       email: '',
       full_name: '',
       password: '',
+      confirmPassword: '',
       role: 'user'
     });
   };
@@ -86,6 +106,15 @@ const AuthForm: React.FC = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               {error}
+            </div>
+          )}
+
+          {passwordError && (
+            <div className={styles.error}>
+              <svg className={styles.errorIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {passwordError}
             </div>
           )}
           
@@ -122,19 +151,74 @@ const AuthForm: React.FC = () => {
               </div>
               
               <div className={styles.inputGroup}>
-                <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  required
-                  className={styles.input}
-                  placeholder="Enter your password"
-                  value={credentials.password}
-                  onChange={handleChange}
-                  disabled={isLoading}
-                  minLength={6}
-                />
+                <div className={styles.passwordContainer}>
+                  <input
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    required
+                    className={styles.input}
+                    placeholder="Enter your password"
+                    value={credentials.password}
+                    onChange={handleChange}
+                    disabled={isLoading}
+                    minLength={6}
+                  />
+                  <button
+                    type="button"
+                    className={styles.passwordToggle}
+                    onClick={() => setShowPassword(!showPassword)}
+                    disabled={isLoading}
+                  >
+                    {showPassword ? (
+                      <svg className={styles.eyeIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
+                      </svg>
+                    ) : (
+                      <svg className={styles.eyeIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                    )}
+                  </button>
+                </div>
               </div>
+
+              {mode === 'register' && (
+                <div className={styles.inputGroup}>
+                  <div className={styles.passwordContainer}>
+                    <input
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      type={showConfirmPassword ? "text" : "password"}
+                      required
+                      className={styles.input}
+                      placeholder="Confirm your password"
+                      value={credentials.confirmPassword}
+                      onChange={handleChange}
+                      disabled={isLoading}
+                      minLength={6}
+                    />
+                    <button
+                      type="button"
+                      className={styles.passwordToggle}
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      disabled={isLoading}
+                    >
+                      {showConfirmPassword ? (
+                        <svg className={styles.eyeIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
+                        </svg>
+                      ) : (
+                        <svg className={styles.eyeIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {mode === 'login' && (
                 <div className={styles.checkboxGroup}>

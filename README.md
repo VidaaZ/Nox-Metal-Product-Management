@@ -52,22 +52,6 @@ A complete full-stack application built with React, TypeScript, and Express.js f
 
 The project follows a monorepo structure with separate backend and frontend directories. The backend uses MVC architecture with controllers handling business logic, routes defining API endpoints, middleware for authentication and authorization, models for database operations, and utilities for common functions. The frontend is built with React and TypeScript, using Vite as the build tool, with components organized by feature and shared utilities in the lib directory.
 
-## Deployment Notes
-
-This application is deployed on Render using SQLite database. 
-
-**Important**: The database resets on each deployment, so:
-- All users need to re-register after deployment
-- Admin user is auto-created with credentials: `admin@example.com` / `admin123`
-- All products and audit logs are reset
-
-For production use, consider using PostgreSQL for persistent data.
-
-### Demo Credentials
-After deployment, you can use these credentials to test the application:
-- **Admin**: `admin@example.com` / `admin123`
-- **Register new users** to test different roles and permissions
-
 ## Getting Started
 
 ### Prerequisites
