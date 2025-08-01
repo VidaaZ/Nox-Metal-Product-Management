@@ -22,23 +22,32 @@ app.use(cors({
       'http://localhost:5173', 
       'http://localhost:3000',
       'https://nox-metal-product-management.vercel.app',
-      'https://nox-metal-product-management-git-main-vidaaz.vercel.app'
+      'https://nox-metal-product-management-git-main-vidaaz.vercel.app',
+      'https://nox-metal-product-management.vercel.app'
     ];
     console.log('CORS check for origin:', origin);
     console.log('Allowed origins:', allowedOrigins);
     
+    // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) {
       console.log('CORS: Allowing request with no origin');
       return callback(null, true);
     }
     
+    // Check if origin is in allowed list
     if (allowedOrigins.indexOf(origin) !== -1) {
       console.log('CORS: Allowing request from:', origin);
       return callback(null, true);
-    } else {
-      console.log('CORS: Blocking request from:', origin);
-      return callback(new Error('Not allowed by CORS'));
     }
+    
+    // Allow any Vercel domain for your project
+    if (origin.includes('vercel.app') && origin.includes('nox-metal')) {
+      console.log('CORS: Allowing Vercel domain:', origin);
+      return callback(null, true);
+    }
+    
+    console.log('CORS: Blocking request from:', origin);
+    return callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -54,7 +63,17 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 app.use('/uploads', (req: express.Request, res: express.Response, next: express.NextFunction) => {
-  res.header('Access-Control-Allow-Origin', 'http://localhost:5173');
+  const origin = req.headers.origin;
+  const allowedOrigins = [
+    'http://localhost:5173',
+    'https://nox-metal-product-management.vercel.app',
+    'https://nox-metal-product-management-git-main-vidaaz.vercel.app'
+  ];
+  
+  if (origin && (allowedOrigins.includes(origin) || (origin.includes('vercel.app') && origin.includes('nox-metal')))) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
+  
   res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type');
   res.header('Access-Control-Allow-Credentials', 'true');
