@@ -14,7 +14,6 @@ export interface RegisterCredentials {
   email: string;
   full_name: string;
   password: string;
-  role?: 'admin' | 'user';
 }
 
 export interface AuthResponse {

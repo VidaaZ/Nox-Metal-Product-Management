@@ -91,7 +91,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
   const hasCheckedAuth = useRef(false);
 
-  // Check if user is logged in on app start
+ 
   useEffect(() => {
     if (hasCheckedAuth.current) return;
     hasCheckedAuth.current = true;
@@ -114,14 +114,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           dispatch({ type: 'AUTH_SUCCESS', payload: user });
         } catch (error) {
           console.error('AuthContext: Profile check failed', error);
-          // Clear invalid auth data
+          
           localStorage.removeItem('auth_token');
           localStorage.removeItem('user');
           dispatch({ type: 'AUTH_ERROR', payload: 'Session expired' });
         }
       } else {
         console.log('AuthContext: No token or stored user found');
-        // Clear any partial auth data
+        
         localStorage.removeItem('auth_token');
         localStorage.removeItem('user');
       }
@@ -138,13 +138,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const response = await authAPI.login(credentials);
       console.log('AuthContext: Login API response received', response);
       
-      // Ensure user has full_name field for backward compatibility
+      
       const userWithFullName = {
         ...response.user,
         full_name: response.user.full_name || response.user.email.split('@')[0]
       };
       
-      // Store token and user atomically
+     
       localStorage.setItem('auth_token', response.token);
       localStorage.setItem('user', JSON.stringify(userWithFullName));
       
@@ -153,17 +153,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } catch (error: any) {
       console.error('AuthContext: Login error details:', error);
       
-      // Handle different types of errors
+     
       let errorMessage = 'Login failed';
       
       if (error.response) {
-        // Server responded with error status
+       
         errorMessage = error.response.data?.error || `Login failed (${error.response.status})`;
       } else if (error.request) {
-        // Request was made but no response received
+       
         errorMessage = 'Network error - please check your connection';
       } else {
-        // Something else happened
+        
         errorMessage = error.message || 'Login failed';
       }
       
@@ -181,7 +181,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const response = await authAPI.register(credentials);
       console.log('AuthContext: Registration API response received', response);
       
-      // Store token and user atomically
+    
       localStorage.setItem('auth_token', response.token);
       localStorage.setItem('user', JSON.stringify(response.user));
       

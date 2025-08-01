@@ -19,8 +19,7 @@ const AuthForm: React.FC = () => {
     email: '',
     full_name: '',
     password: '',
-    confirmPassword: '',
-    role: 'user' as 'user' | 'admin'
+    confirmPassword: ''
   });
 
   const from = location.state?.from?.pathname || '/dashboard';
@@ -48,8 +47,7 @@ const AuthForm: React.FC = () => {
         const registerData: RegisterCredentials = {
           email: credentials.email,
           full_name: credentials.full_name,
-          password: credentials.password,
-          role: credentials.role
+          password: credentials.password
         };
         await register(registerData);
       }
@@ -80,8 +78,7 @@ const AuthForm: React.FC = () => {
       email: '',
       full_name: '',
       password: '',
-      confirmPassword: '',
-      role: 'user'
+      confirmPassword: ''
     });
   };
 
@@ -235,21 +232,7 @@ const AuthForm: React.FC = () => {
                 </div>
               )}
 
-              {mode === 'register' && (
-                <div className={styles.inputGroup}>
-                  <select
-                    id="role"
-                    name="role"
-                    value={credentials.role}
-                    onChange={handleChange}
-                    disabled={isLoading}
-                    className={styles.select}
-                  >
-                    <option value="user">User</option>
-                    <option value="admin">Admin</option>
-                  </select>
-                </div>
-              )}
+
 
               <button
                 type="submit"

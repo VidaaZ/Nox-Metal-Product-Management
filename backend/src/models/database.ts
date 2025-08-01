@@ -12,7 +12,7 @@ export const connectToDatabase = async (): Promise<void> => {
   }
 };
 
-// User Schema
+
 const userSchema = new mongoose.Schema({
   email: {
     type: String,

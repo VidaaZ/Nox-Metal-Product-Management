@@ -16,14 +16,12 @@ const PORT = process.env.PORT || 3001;
 
 app.use(helmet());
 
-// CORS configuration - Update this section
 app.use(cors({
   origin: function (origin, callback) {
     const allowedOrigins = ['http://localhost:5173', 'http://localhost:3000'];
     console.log('CORS check for origin:', origin);
     console.log('Allowed origins:', allowedOrigins);
     
-    // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) {
       console.log('CORS: Allowing request with no origin');
       return callback(null, true);
@@ -50,15 +48,12 @@ app.use(express.urlencoded({ extended: true }));
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Static file serving with CORS headers
 app.use('/uploads', (req, res, next) => {
-  // Set CORS headers for static files
   res.header('Access-Control-Allow-Origin', 'http://localhost:5173');
   res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type');
   res.header('Access-Control-Allow-Credentials', 'true');
   
-  // Handle preflight requests
   if (req.method === 'OPTIONS') {
     res.sendStatus(200);
     return;
@@ -89,7 +84,6 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
   res.status(500).json({ error: 'Something went wrong!' });
 });
 
-// Initialize database connection and start server
 console.log('Attempting to connect to database...');
 connectToDatabase()
   .then(() => {

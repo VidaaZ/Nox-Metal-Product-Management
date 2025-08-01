@@ -42,10 +42,10 @@ connectToDatabase()
   .then(() => {
     console.log('Database connected successfully, starting server...');
     app.listen(PORT, () => {
-      console.log(`✅ Server running on port ${PORT}`);
-      console.log(`✅ MongoDB Atlas connected successfully!`);
-      console.log(`✅ Environment: ${process.env.NODE_ENV || 'development'}`);
-      console.log(`✅ Test the API: http://localhost:${PORT}/api/test`);
+      console.log(` Server running on port ${PORT}`);
+      console.log(`MongoDB Atlas connected successfully!`);
+      console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+      console.log(`Test the API: http://localhost:${PORT}/api/test`);
     });
   })
   .catch((error) => {
