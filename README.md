@@ -29,5 +29,3 @@ The project follows a monorepo structure with separate backend and frontend dire
 - **Admin**: admin@example.com / admin123
 
 
-
-
