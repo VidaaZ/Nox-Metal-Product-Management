@@ -24,6 +24,7 @@ export interface LoginInput {
 
 export interface Product {
   _id: Types.ObjectId;
+  id?: string; // For API responses
   name: string;
   price: number;
   description?: string;

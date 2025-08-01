@@ -24,12 +24,12 @@ export interface AuthResponse {
 }
 
 export interface Product {
-  id: number;
+  id: string; // Change from number to string
   name: string;
   price: number;
   description?: string;
   is_deleted: boolean;
-  created_by: number;
+  created_by: string; // Change from number to string
   created_at: string;
   updated_at: string;
   created_by_email?: string;

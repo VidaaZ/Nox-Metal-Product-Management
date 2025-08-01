@@ -96,7 +96,7 @@ export const productsAPI = {
     return response.data as PaginatedResponse<Product>;
   },
 
-  getProduct: async (id: number) => {
+  getProduct: async (id: string) => {
     const response = await api.get(`/products/${id}`);
     return response.data as Product;
   },
@@ -106,17 +106,17 @@ export const productsAPI = {
     return response.data;
   },
 
-  updateProduct: async (id: number, product: Partial<{ name: string; price: number; description: string }>) => {
+  updateProduct: async (id: string, product: Partial<{ name: string; price: number; description: string }>) => {
     const response = await api.put(`/products/${id}`, product);
     return response.data;
   },
 
-  deleteProduct: async (id: number) => {
+  deleteProduct: async (id: string) => {
     const response = await api.delete(`/products/${id}`);
     return response.data;
   },
 
-  restoreProduct: async (id: number) => {
+  restoreProduct: async (id: string) => {
     const response = await api.patch(`/products/${id}/restore`);
     return response.data;
   },

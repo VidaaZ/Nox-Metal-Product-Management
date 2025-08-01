@@ -46,6 +46,7 @@ export class ProductService {
 
     const products: Product[] = foundProducts.map(product => ({
       _id: product._id,
+      id: product._id.toString(), // Add this line
       name: product.name,
       price: product.price,
       description: product.description || undefined,
@@ -80,6 +81,7 @@ export class ProductService {
 
     const product: Product = {
       _id: foundProduct._id,
+      id: foundProduct._id.toString(), // Add this line
       name: foundProduct.name,
       price: foundProduct.price,
       description: foundProduct.description || undefined,
