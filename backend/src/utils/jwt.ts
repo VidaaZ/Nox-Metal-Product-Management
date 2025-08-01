@@ -2,7 +2,7 @@ import jwt, { SignOptions } from 'jsonwebtoken';
 import { AuthenticatedUser } from '../types/index.js';
 
 // Use a more secure default secret and ensure it's consistent
-const JWT_SECRET = process.env.JWT_SECRET || 'nox-metal-super-secret-jwt-key-2024-change-in-production';
+const JWT_SECRET = process.env.JWT_SECRET || 'NoxMetalJWTSecret2024!@#';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
 
 export const generateToken = (user: AuthenticatedUser): string => {

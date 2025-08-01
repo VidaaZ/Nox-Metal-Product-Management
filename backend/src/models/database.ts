@@ -1,8 +1,12 @@
 import mongoose from 'mongoose';
 
-const MONGODB_URI = process.env.MONGODB_URI || `mongodb+srv://vida1997zarei:test123@cluster0.fimrovg.mongodb.net/Nox-Metal?retryWrites=true&w=majority&appName=Cluster0`;
+const MONGODB_URI = process.env.MONGODB_URI || '';
 
 export const connectToDatabase = async (): Promise<void> => {
+  if (!MONGODB_URI) {
+    throw new Error('MONGODB_URI environment variable is required');
+  }
+  
   try {
     await mongoose.connect(MONGODB_URI);
     console.log('Connected to MongoDB Atlas');
