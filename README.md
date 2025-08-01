@@ -117,4 +117,99 @@ This will start both the backend (port 3001) and frontend (port 5173/5174) serve
 ### Audit Logs
 - `GET /api/audit` - Get audit logs with pagination (admin only)
 
+## Testing Guide for Hiring Managers
+
+### Quick Setup for Testing
+```bash
+# 1. Clone and setup
+git clone <repository-url>
+cd Nox-Metal
+npm run install:all
+
+# 2. Start the application
+npm run dev
+
+# 3. Run tests
+cd backend && npm test
+```
+
+### Test Credentials
+- **Admin User**: admin@example.com / admin123
+- **Regular User**: user@example.com / user123
+- **Or create new users** through the registration form
+
+### What to Test
+
+#### 🔐 Authentication Testing
+1. **Register a new user** - Test user creation
+2. **Login with credentials** - Verify authentication
+3. **Access protected routes** - Ensure proper authorization
+4. **Test role-based access** - Admin vs User permissions
+
+#### 📦 Product Management Testing
+1. **Create products** (admin only) - Add new items
+2. **View product list** - Test pagination and search
+3. **Edit products** (admin only) - Modify existing items
+4. **Delete products** (admin only) - Soft delete functionality
+5. **Restore products** (admin only) - Recover deleted items
+6. **Search and sort** - Test filtering capabilities
+
+#### 📊 Audit Logging Testing
+1. **View audit logs** (admin only) - Check logging system
+2. **Perform actions** - Create/edit/delete products
+3. **Verify logging** - Ensure actions are tracked properly
+
+#### 🧪 Code Quality Testing
+1. **Run test suite** - Execute all tests
+2. **Check error handling** - Test edge cases
+3. **Review code structure** - Examine organization
+
+### Expected Behavior
+- ✅ All tests should pass
+- ✅ Authentication should work properly
+- ✅ Role-based access should be enforced
+- ✅ Product CRUD operations should function
+- ✅ Audit logging should track all actions
+- ✅ UI should be responsive and user-friendly
+
+## Deployment Options
+
+### Option 1: Local Testing (Recommended)
+Follow the "Quick Setup for Testing" instructions above.
+
+### Option 2: Deploy to Vercel (Free)
+```bash
+# Install Vercel CLI
+npm i -g vercel
+
+# Deploy frontend
+cd frontend
+vercel
+
+# Deploy backend (requires database setup)
+cd ../backend
+vercel
+```
+
+### Option 3: Deploy to Railway (Free)
+```bash
+# Install Railway CLI
+npm i -g @railway/cli
+
+# Deploy entire project
+railway login
+railway init
+railway up
+```
+
+## Demo Credentials
+- **Admin**: admin@example.com / admin123
+- **User**: user@example.com / user123
+
+## Test Coverage
+- **Backend Tests**: 20 tests covering core logic
+- **Frontend Tests**: Component testing with React Testing Library
+- **Security Tests**: Password hashing, JWT validation
+- **Validation Tests**: Input sanitization and business rules
+
 

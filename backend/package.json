@@ -8,7 +8,9 @@
     "build": "tsc --project tsconfig.json",
     "start": "node dist/index.js",
     "create-admin": "node --loader ts-node/esm src/scripts/createAdmin.ts",
-    "view-users": "node --loader ts-node/esm src/scripts/viewUsers.ts",
+    "view-users": "node --loader ts-node/esm src/scripts/showUsers.ts",
+    "show-data": "node --loader ts-node/esm src/scripts/showData.ts",
+    "test-login": "node --loader ts-node/esm src/scripts/testLogin.ts",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch"
   },
@@ -34,8 +36,10 @@
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",
+    "@types/supertest": "^6.0.3",
     "jest": "^29.7.0",
     "nodemon": "^3.1.10",
+    "supertest": "^7.1.4",
     "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2"
   },

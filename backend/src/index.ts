@@ -7,7 +7,7 @@ import { fileURLToPath } from 'url';
 import authRoutes from './routes/auth.js';
 import productRoutes from './routes/products.js';
 import auditRoutes from './routes/audit.js';
-import './models/database.js';
+import {initializeDatabase} from  './models/database.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -22,7 +22,7 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
+    
     if (!origin) {
       console.log('CORS: Allowing request with no origin');
       return callback(null, true);
@@ -68,6 +68,8 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
   console.error(err.stack);
   res.status(500).json({ error: 'Something went wrong!' });
 });
+
+initializeDatabase();
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

@@ -3,16 +3,16 @@ import sqlite3 from 'sqlite3';
 
 const dbPath = process.env.NODE_ENV === 'production' 
   ? '/tmp/database.sqlite' 
-  : './database.sqlite';
+  : './database2.sqlite';
 
 console.log('Database path:', dbPath);
 
 
 const db = new sqlite3.Database(dbPath, (err) => {
   if (err) {
-    console.error('❌ Error opening database:', err.message);
+    console.error('Error opening database:', err.message);
   } else {
-    console.log('✅ Connected to SQLite database');
+    console.log('Connected to SQLite database');
   }
 });
 
@@ -106,9 +106,7 @@ const initializeDatabase = (): Promise<void> => {
   });
 };
 
-initializeDatabase().catch(err => {
-  console.error('Database initialization failed:', err);
-});
+export { initializeDatabase };
 
 export { db };
 export default db; 
