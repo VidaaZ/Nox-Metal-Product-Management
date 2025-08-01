@@ -44,7 +44,7 @@ export class ProductService {
       .limit(Number(limit))
       .lean();
 
-    const products: Product[] = foundProducts.map(product => ({
+    const products: Product[] = foundProducts.map((product: any) => ({
       _id: product._id,
       id: product._id.toString(), // Add this line
       name: product.name,

@@ -99,7 +99,7 @@ export class AuthService {
       .sort({ created_at: -1 })
       .lean();
 
-    return foundUsers.map(user => ({
+    return foundUsers.map((user: any) => ({
       _id: user._id,
       email: user.email,
       full_name: user.full_name,

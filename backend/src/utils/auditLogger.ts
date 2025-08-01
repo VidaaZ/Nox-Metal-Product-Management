@@ -47,7 +47,7 @@ export const getAuditLogs = async (
       .limit(limit)
       .lean();
 
-    const logs: AuditLog[] = foundLogs.map(log => ({
+    const logs: AuditLog[] = foundLogs.map((log: any) => ({
       _id: log._id,
       action: log.action,
       user_email: log.user_email,

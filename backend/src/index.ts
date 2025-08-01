@@ -53,7 +53,7 @@ app.use(express.urlencoded({ extended: true }));
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-app.use('/uploads', (req, res, next) => {
+app.use('/uploads', (req: express.Request, res: express.Response, next: express.NextFunction) => {
   res.header('Access-Control-Allow-Origin', 'http://localhost:5173');
   res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type');
@@ -69,18 +69,18 @@ app.use('/uploads', (req, res, next) => {
 
 app.use('/api/auth', authRoutes);
 
-app.get('/health', (req, res) => {
+app.get('/health', (req: express.Request, res: express.Response) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
-app.get('/api/test', (req, res) => {
+app.get('/api/test', (req: express.Request, res: express.Response) => {
   res.json({ message: 'MongoDB Atlas migration successful!', database: 'Connected' });
 });
 
 app.use('/api/products', productRoutes);
 app.use('/api/audit', auditRoutes);
 
-app.use((req, res) => {
+app.use((req: express.Request, res: express.Response) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
