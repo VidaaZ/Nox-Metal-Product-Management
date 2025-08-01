@@ -18,7 +18,11 @@ export class ProductService {
     const showDeleted = isAdmin && String(includeDeleted) === 'true';
     
     // Build filter
-    const filter: any = { is_deleted: showDeleted };
+    const filter: any = {};
+    if (!showDeleted) {
+      filter.is_deleted = false;
+    }
+    // If showDeleted is true, don't filter by is_deleted (show all products)
 
     // Add search filter
     if (search) {
