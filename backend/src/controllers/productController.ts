@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { productService } from '../services/productService.js';
 import { ProductInput, ProductQuery } from '../types/index.js';
+import path from 'path';
 
 export const getProducts = async (req: any, res: Response) => {
   try {
@@ -45,8 +46,15 @@ export const createProduct = async (req: any, res: Response) => {
       return res.status(400).json({ error: 'Price must be greater than 0' });
     }
 
+    // Handle image upload
+    let image_url: string | undefined;
+    if (req.file) {
+      const imageUrl = `/uploads/${req.file.filename}`; // Use relative URL
+      image_url = imageUrl;
+    }
+
     const result = await productService.createProduct(
-      { name, price, description },
+      { name, price, description, image_url },
       req.user.id,
       req.user.email
     );
@@ -66,9 +74,17 @@ export const updateProduct = async (req: any, res: Response) => {
     const { id } = req.params;
     const { name, price, description }: Partial<ProductInput> = req.body;
 
+    // Handle image upload
+    let image_url: string | undefined;
+    if (req.file) {
+      // Create the image URL based on the uploaded file
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      image_url = `${baseUrl}/uploads/${req.file.filename}`;
+    }
+
     await productService.updateProduct(
       id,
-      { name, price, description },
+      { name, price, description, image_url },
       req.user.email
     );
 

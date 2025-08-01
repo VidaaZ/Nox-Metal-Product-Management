@@ -28,6 +28,7 @@ export interface Product {
   name: string;
   price: number;
   description?: string;
+  image_url?: string;
   is_deleted: boolean;
   created_by: Types.ObjectId;
   created_at: Date;
@@ -38,6 +39,7 @@ export interface ProductInput {
   name: string;
   price: number;
   description?: string;
+  image_url?: string;
 }
 
 export interface ProductUpdateInput extends Partial<ProductInput> {

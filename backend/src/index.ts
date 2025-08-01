@@ -16,34 +16,30 @@ const PORT = process.env.PORT || 3001;
 
 app.use(helmet());
 
-// CORS configuration
-const allowedOrigins = [
-  'http://localhost:5173',
-  'http://localhost:3000'
-];
-
+// CORS configuration - Update this section
 app.use(cors({
   origin: function (origin, callback) {
+    const allowedOrigins = ['http://localhost:5173', 'http://localhost:3000'];
+    console.log('CORS check for origin:', origin);
+    console.log('Allowed origins:', allowedOrigins);
+    
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) {
       console.log('CORS: Allowing request with no origin');
       return callback(null, true);
     }
     
-    console.log('CORS check for origin:', origin);
-    console.log('Allowed origins:', allowedOrigins);
-    
     if (allowedOrigins.indexOf(origin) !== -1) {
-      console.log('CORS: Allowing origin:', origin);
-      callback(null, true);
+      console.log('CORS: Allowing request from:', origin);
+      return callback(null, true);
     } else {
-      console.log('CORS blocked origin:', origin);
-      callback(new Error('Not allowed by CORS'));
+      console.log('CORS: Blocking request from:', origin);
+      return callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
 app.use(morgan('combined'));
@@ -53,6 +49,23 @@ app.use(express.urlencoded({ extended: true }));
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Static file serving with CORS headers
+app.use('/uploads', (req, res, next) => {
+  // Set CORS headers for static files
+  res.header('Access-Control-Allow-Origin', 'http://localhost:5173');
+  res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    res.sendStatus(200);
+    return;
+  }
+  
+  next();
+}, express.static(path.join(__dirname, '../uploads')));
 
 app.use('/api/auth', authRoutes);
 

@@ -42,6 +42,10 @@ const ProductManagement: React.FC = () => {
   });
   const [formLoading, setFormLoading] = useState(false);
 
+  // Add these state variables after the existing state declarations
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+
   const isAdmin = user?.role === 'admin';
 
   // Check URL params for actions
@@ -93,15 +97,24 @@ const ProductManagement: React.FC = () => {
     try {
       setFormLoading(true);
       
+      const productData = {
+        name: formData.name,
+        price: formData.price,
+        description: formData.description,
+        image: selectedImage
+      };
+      
       if (editingProduct) {
-        await productsAPI.updateProduct(editingProduct.id, formData);
+        await productsAPI.updateProduct(editingProduct.id, productData);
       } else {
-        await productsAPI.createProduct(formData);
+        await productsAPI.createProduct(productData);
       }
       
       setShowForm(false);
       setEditingProduct(null);
       setFormData({ name: '', price: 0, description: '' });
+      setSelectedImage(null);
+      setImagePreview(null);
       searchParams.delete('action');
       setSearchParams(searchParams);
       await loadProducts();
@@ -146,7 +159,22 @@ const ProductManagement: React.FC = () => {
       price: product.price,
       description: product.description || ''
     });
+    setImagePreview(product.image_url || null);
+    setSelectedImage(null);
     setShowForm(true);
+  };
+
+  // Add image handling function after the existing functions
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedImage(file);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const formatPrice = (price: number) => {
@@ -304,7 +332,21 @@ const ProductManagement: React.FC = () => {
                   />
                 </div>
 
-
+                {/* Add image upload field to the form (add this after the description field) */}
+                <div className={styles.formGroup}>
+                  <label className={styles.formLabel}>Image (Optional)</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className={styles.formInput}
+                  />
+                  {imagePreview && (
+                    <div className={styles.imagePreviewContainer}>
+                      <img src={imagePreview} alt="Preview" className={styles.imagePreview} />
+                    </div>
+                  )}
+                </div>
 
                 <div className={styles.formButtons}>
                   <button
@@ -319,6 +361,9 @@ const ProductManagement: React.FC = () => {
                     onClick={() => {
                       setShowForm(false);
                       setEditingProduct(null);
+                      setFormData({ name: '', price: 0, description: '' });
+                      setSelectedImage(null);
+                      setImagePreview(null);
                       searchParams.delete('action');
                       setSearchParams(searchParams);
                     }}
@@ -403,6 +448,22 @@ const ProductManagement: React.FC = () => {
                           
                           <div className={styles.productMeta}>
                             <span>Created: {formatDate(product.created_at)}</span>
+                            {/* Add image preview beside the time */}
+                            {product.image_url && (
+                              <div className={styles.imagePreview}>
+                                <img 
+                                  src={product.image_url.replace('http://localhost:3001', '')} 
+                                  alt={product.name}
+                                  className={styles.productImage}
+                                  onLoad={() => console.log('Image loaded successfully:', product.image_url)}
+                                  onError={(e) => {
+                                    console.log('Image failed to load:', product.image_url);
+                                    const target = e.target as HTMLImageElement;
+                                    target.style.display = 'none';
+                                  }}
+                                />
+                              </div>
+                            )}
                             {product.updated_at !== product.created_at && (
                               <span>Updated: {formatDate(product.updated_at)}</span>
                             )}

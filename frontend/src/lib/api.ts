@@ -101,13 +101,37 @@ export const productsAPI = {
     return response.data as Product;
   },
 
-  createProduct: async (product: { name: string; price: number; description?: string }) => {
-    const response = await api.post('/products', product);
+  createProduct: async (product: { name: string; price: number; description?: string; image?: File }) => {
+    const formData = new FormData();
+    formData.append('name', product.name);
+    formData.append('price', product.price.toString());
+    if (product.description) {
+      formData.append('description', product.description);
+    }
+    if (product.image) {
+      formData.append('image', product.image);
+    }
+
+    const response = await api.post('/products', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
     return response.data;
   },
 
-  updateProduct: async (id: string, product: Partial<{ name: string; price: number; description: string }>) => {
-    const response = await api.put(`/products/${id}`, product);
+  updateProduct: async (id: string, product: Partial<{ name: string; price: number; description: string; image?: File }>) => {
+    const formData = new FormData();
+    if (product.name) formData.append('name', product.name);
+    if (product.price) formData.append('price', product.price.toString());
+    if (product.description) formData.append('description', product.description);
+    if (product.image) formData.append('image', product.image);
+
+    const response = await api.put(`/products/${id}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
     return response.data;
   },
 

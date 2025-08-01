@@ -28,6 +28,7 @@ export interface Product {
   name: string;
   price: number;
   description?: string;
+  image_url?: string;
   is_deleted: boolean;
   created_by: string; // Change from number to string
   created_at: string;
@@ -39,6 +40,7 @@ export interface ProductInput {
   name: string;
   price: number;
   description?: string;
+  image_url?: string;
 }
 
 export interface PaginatedResponse<T> {

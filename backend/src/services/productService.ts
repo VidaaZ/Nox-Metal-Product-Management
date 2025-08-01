@@ -50,6 +50,7 @@ export class ProductService {
       name: product.name,
       price: product.price,
       description: product.description || undefined,
+      image_url: product.image_url || undefined,
       is_deleted: product.is_deleted,
       created_by: product.created_by,
       created_at: (product as any).createdAt || new Date(),
@@ -85,6 +86,7 @@ export class ProductService {
       name: foundProduct.name,
       price: foundProduct.price,
       description: foundProduct.description || undefined,
+      image_url: foundProduct.image_url || undefined,
       is_deleted: foundProduct.is_deleted,
       created_by: foundProduct.created_by,
       created_at: (foundProduct as any).createdAt || new Date(),
@@ -95,7 +97,7 @@ export class ProductService {
   }
 
   async createProduct(productData: ProductInput, userId: string, userEmail: string): Promise<{ id: string }> {
-    const { name, price, description } = productData;
+    const { name, price, description, image_url } = productData;
 
     if (!name || !price) {
       throw new Error('Name and price are required');
@@ -109,6 +111,7 @@ export class ProductService {
       name,
       price,
       description,
+      image_url,
       created_by: new Types.ObjectId(userId),
       is_deleted: false
     });
@@ -127,7 +130,7 @@ export class ProductService {
   }
 
   async updateProduct(id: string, productData: Partial<ProductInput>, userEmail: string): Promise<void> {
-    const { name, price, description } = productData;
+    const { name, price, description, image_url } = productData;
 
     const existingProduct = await ProductModel.findById(id);
 
@@ -152,6 +155,9 @@ export class ProductService {
     }
     if (description !== undefined) {
       updates.description = description;
+    }
+    if (image_url !== undefined) {
+      updates.image_url = image_url;
     }
 
     if (Object.keys(updates).length === 0) {
