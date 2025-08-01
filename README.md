@@ -204,12 +204,5 @@ railway up
 
 ## Demo Credentials
 - **Admin**: admin@example.com / admin123
-- **User**: user@example.com / user123
-
-## Test Coverage
-- **Backend Tests**: 20 tests covering core logic
-- **Frontend Tests**: Component testing with React Testing Library
-- **Security Tests**: Password hashing, JWT validation
-- **Validation Tests**: Input sanitization and business rules
 
 
