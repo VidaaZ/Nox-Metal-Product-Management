@@ -19,10 +19,13 @@ export class ProductService {
     
     // Build filter
     const filter: any = {};
-    if (!showDeleted) {
+    if (showDeleted) {
+      // Show only deleted products
+      filter.is_deleted = true;
+    } else {
+      // Show only active products
       filter.is_deleted = false;
     }
-    // If showDeleted is true, don't filter by is_deleted (show all products)
 
     // Add search filter
     if (search) {
