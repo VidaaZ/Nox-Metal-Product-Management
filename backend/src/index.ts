@@ -7,7 +7,9 @@ import { fileURLToPath } from 'url';
 import authRoutes from './routes/auth.js';
 import productRoutes from './routes/products.js';
 import auditRoutes from './routes/audit.js';
-import {initializeDatabase} from  './models/database.js';
+import { connectToDatabase } from  './models/database.js';
+
+console.log('Starting server...');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -22,7 +24,7 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: function (origin, callback) {
-    
+    // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) {
       console.log('CORS: Allowing request with no origin');
       return callback(null, true);
@@ -53,12 +55,17 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 app.use('/api/auth', authRoutes);
-app.use('/api/products', productRoutes);
-app.use('/api/audit', auditRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
+
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'MongoDB Atlas migration successful!', database: 'Connected' });
+});
+
+app.use('/api/products', productRoutes);
+app.use('/api/audit', auditRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });
@@ -69,9 +76,17 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
   res.status(500).json({ error: 'Something went wrong!' });
 });
 
-initializeDatabase();
-
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-}); 
+// Initialize database connection and start server
+console.log('Attempting to connect to database...');
+connectToDatabase()
+  .then(() => {
+    console.log('Database connected successfully, starting server...');
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+      console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+    });
+  })
+  .catch((error) => {
+    console.error('Failed to connect to database:', error);
+    process.exit(1);
+  }); 

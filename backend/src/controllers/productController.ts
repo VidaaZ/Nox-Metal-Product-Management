@@ -21,7 +21,7 @@ export const getProduct = async (req: any, res: Response) => {
     const { id } = req.params;
     const isAdmin = req.user?.role === 'admin';
 
-    const product = await productService.getProduct(Number(id), isAdmin);
+    const product = await productService.getProduct(id, isAdmin);
 
     res.json(product);
   } catch (error) {
@@ -67,7 +67,7 @@ export const updateProduct = async (req: any, res: Response) => {
     const { name, price, description }: Partial<ProductInput> = req.body;
 
     await productService.updateProduct(
-      Number(id),
+      id,
       { name, price, description },
       req.user.email
     );
@@ -97,7 +97,7 @@ export const deleteProduct = async (req: any, res: Response) => {
   try {
     const { id } = req.params;
 
-    await productService.deleteProduct(Number(id), req.user.email);
+    await productService.deleteProduct(id, req.user.email);
 
     res.json({ message: 'Product deleted successfully' });
   } catch (error) {
@@ -118,7 +118,7 @@ export const restoreProduct = async (req: any, res: Response) => {
   try {
     const { id } = req.params;
 
-    await productService.restoreProduct(Number(id), req.user.email);
+    await productService.restoreProduct(id, req.user.email);
 
     res.json({ message: 'Product restored successfully' });
   } catch (error) {

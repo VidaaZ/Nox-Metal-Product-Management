@@ -13,7 +13,7 @@ export const getProfile = async (req: any, res: Response) => {
     const user = await authService.getProfile(userId);
 
     const authenticatedUser: AuthenticatedUser = {
-      id: user.id,
+      id: user._id.toString(),
       email: user.email,
       full_name: user.full_name,
       role: user.role
@@ -37,7 +37,7 @@ export const register = async (req: Request, res: Response) => {
     const { user, token } = await authService.register(email, password, full_name);
 
     const authenticatedUser: AuthenticatedUser = {
-      id: user.id,
+      id: user._id.toString(),
       email: user.email,
       full_name: user.full_name,
       role: user.role
@@ -68,7 +68,7 @@ export const login = async (req: Request, res: Response) => {
     const { user, token } = await authService.login(email, password);
 
     const authenticatedUser: AuthenticatedUser = {
-      id: user.id,
+      id: user._id.toString(),
       email: user.email,
       full_name: user.full_name,
       role: user.role

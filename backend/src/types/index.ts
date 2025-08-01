@@ -1,11 +1,13 @@
+import { Types } from 'mongoose';
+
 export interface User {
-  id: number;
+  _id: Types.ObjectId;
   email: string;
   full_name: string;
   password: string;
   role: 'admin' | 'user';
-  created_at: string;
-  updated_at: string;
+  created_at: Date;
+  updated_at: Date;
 }
 
 export interface UserInput {
@@ -21,14 +23,14 @@ export interface LoginInput {
 }
 
 export interface Product {
-  id: number;
+  _id: Types.ObjectId;
   name: string;
   price: number;
   description?: string;
   is_deleted: boolean;
-  created_by: number;
-  created_at: string;
-  updated_at: string;
+  created_by: Types.ObjectId;
+  created_at: Date;
+  updated_at: Date;
 }
 
 export interface ProductInput {
@@ -38,21 +40,21 @@ export interface ProductInput {
 }
 
 export interface ProductUpdateInput extends Partial<ProductInput> {
-  id: number;
+  id: string;
 }
 
 export interface AuditLog {
-  id: number;
+  _id: Types.ObjectId;
   action: 'create' | 'update' | 'delete' | 'restore';
   user_email: string;
-  product_id?: number;
+  product_id?: Types.ObjectId;
   product_name?: string;
   details?: string;
-  timestamp: string;
+  timestamp: Date;
 }
 
 export interface AuthenticatedUser {
-  id: number;
+  id: string;
   email: string;
   full_name: string;
   role: 'admin' | 'user';

@@ -1,34 +1,29 @@
-import { db } from '../models/database.js';
+import { AuditLog as AuditLogModel } from '../models/database.js';
 import { AuditLog } from '../types/index.js';
+import { Types } from 'mongoose';
 
 export const logAuditAction = async (
   action: 'create' | 'update' | 'delete' | 'restore',
   userEmail: string,
-  productId?: number,
+  productId?: string,
   productName?: string,
   details?: string
 ): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    // Get current time in Canada timezone
-    const now = new Date();
-    const canadaTime = new Date(now.toLocaleString("en-US", {timeZone: "America/Toronto"}));
-    const timestamp = canadaTime.toISOString();
-    
-    db.run(
-      `INSERT INTO audit_logs (action, user_email, product_id, product_name, details, timestamp) 
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [action, userEmail, productId, productName, details, timestamp],
-      function (err) {
-        if (err) {
-          console.error('Audit log error:', err);
-          reject(err);
-        } else {
-          console.log(`Audit log created: ${action} by ${userEmail} for product ${productName || productId}`);
-          resolve();
-        }
-      }
-    );
-  });
+  try {
+    const auditLog = new AuditLogModel({
+      action,
+      user_email: userEmail,
+      product_id: productId ? new Types.ObjectId(productId) : undefined,
+      product_name: productName,
+      details
+    });
+
+    await auditLog.save();
+    console.log(`Audit log created: ${action} by ${userEmail} for product ${productName || productId}`);
+  } catch (error) {
+    console.error('Audit log error:', error);
+    throw error;
+  }
 };
 
 export const getAuditLogs = async (
@@ -39,34 +34,33 @@ export const getAuditLogs = async (
   
   console.log('Getting audit logs with offset:', offset, 'limit:', limit);
   
-  return new Promise((resolve, reject) => {
+  try {
     // Get total count
-    db.get('SELECT COUNT(*) as count FROM audit_logs', [], (err, countRow: any) => {
-      if (err) {
-        console.error('Error getting audit logs count:', err);
-        reject(err);
-        return;
-      }
-      
-      const total = countRow.count;
-      console.log('Total audit logs in database:', total);
-      
-      // Get paginated logs
-      db.all(
-        `SELECT * FROM audit_logs 
-         ORDER BY timestamp DESC 
-         LIMIT ? OFFSET ?`,
-        [limit, offset],
-        (err, rows: AuditLog[]) => {
-          if (err) {
-            console.error('Error getting audit logs:', err);
-            reject(err);
-          } else {
-            console.log('Retrieved audit logs:', rows.length);
-            resolve({ logs: rows, total });
-          }
-        }
-      );
-    });
-  });
-}; 
+    const total = await AuditLogModel.countDocuments();
+    console.log('Total audit logs in database:', total);
+    
+    // Get paginated logs
+    const foundLogs = await AuditLogModel
+      .find({})
+      .sort({ timestamp: -1 })
+      .skip(offset)
+      .limit(limit)
+      .lean();
+
+    const logs: AuditLog[] = foundLogs.map(log => ({
+      _id: log._id,
+      action: log.action,
+      user_email: log.user_email,
+      product_id: log.product_id || undefined,
+      product_name: log.product_name || undefined,
+      details: log.details || undefined,
+      timestamp: log.timestamp
+    }));
+
+    console.log('Retrieved audit logs:', logs.length);
+    return { logs, total };
+  } catch (error) {
+    console.error('Error getting audit logs:', error);
+    throw error;
+  }
+};

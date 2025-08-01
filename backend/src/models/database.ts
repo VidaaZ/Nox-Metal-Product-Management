@@ -1,112 +1,104 @@
-import sqlite3 from 'sqlite3';
+import mongoose from 'mongoose';
 
+const MONGODB_URI = process.env.MONGODB_URI || `mongodb+srv://vida1997zarei:test123@cluster0.fimrovg.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
-const dbPath = process.env.NODE_ENV === 'production' 
-  ? '/tmp/database.sqlite' 
-  : './database2.sqlite';
+export const connectToDatabase = async (): Promise<void> => {
+  try {
+    await mongoose.connect(MONGODB_URI);
+    console.log('Connected to MongoDB Atlas');
+  } catch (error) {
+    console.error('Error connecting to MongoDB:', error);
+    throw error;
+  }
+};
 
-console.log('Database path:', dbPath);
+// User Schema
+const userSchema = new mongoose.Schema({
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    lowercase: true,
+    trim: true
+  },
+  full_name: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  password: {
+    type: String,
+    required: true
+  },
+  role: {
+    type: String,
+    enum: ['admin', 'user'],
+    default: 'user'
+  }
+}, {
+  timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }
+});
 
+// Product Schema
+const productSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  price: {
+    type: Number,
+    required: true,
+    min: 0
+  },
+  description: {
+    type: String,
+    trim: true
+  },
+  is_deleted: {
+    type: Boolean,
+    default: false
+  },
+  created_by: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  }
+}, {
+  timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }
+});
 
-const db = new sqlite3.Database(dbPath, (err) => {
-  if (err) {
-    console.error('Error opening database:', err.message);
-  } else {
-    console.log('Connected to SQLite database');
+// Audit Log Schema
+const auditLogSchema = new mongoose.Schema({
+  action: {
+    type: String,
+    enum: ['create', 'update', 'delete', 'restore'],
+    required: true
+  },
+  user_email: {
+    type: String,
+    required: true
+  },
+  product_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Product'
+  },
+  product_name: {
+    type: String
+  },
+  details: {
+    type: String
+  },
+  timestamp: {
+    type: Date,
+    default: () => {
+      const now = new Date();
+      return new Date(now.toLocaleString("en-US", {timeZone: "America/Toronto"}));
+    }
   }
 });
 
-
-db.run('PRAGMA foreign_keys = ON');
-
-const initializeDatabase = (): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    console.log('Database tables initialized');
-
-
-    db.run(`
-      CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        email TEXT UNIQUE NOT NULL,
-        full_name TEXT NOT NULL,
-        password TEXT NOT NULL,
-        role TEXT NOT NULL DEFAULT 'user' CHECK (role IN ('admin', 'user')),
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      )
-    `, (err) => {
-      if (err) {
-        console.error('Error creating users table:', err);
-        reject(err);
-        return;
-      }
-
-      db.run(`
-        CREATE TABLE IF NOT EXISTS products (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          name TEXT NOT NULL,
-          price REAL NOT NULL,
-          description TEXT,
-          is_deleted INTEGER DEFAULT 0,
-          created_by INTEGER,
-          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-          updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-          FOREIGN KEY (created_by) REFERENCES users (id)
-        )
-      `, (err) => {
-        if (err) {
-          console.error('Error creating products table:', err);
-          reject(err);
-          return;
-        }
-
-        db.run(`
-          CREATE TABLE IF NOT EXISTS audit_logs (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            action TEXT NOT NULL CHECK (action IN ('create', 'update', 'delete', 'restore')),
-            user_email TEXT NOT NULL,
-            product_id INTEGER,
-            product_name TEXT,
-            details TEXT,
-            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (product_id) REFERENCES products (id)
-          )
-        `, (err) => {
-          if (err) {
-            console.error('Error creating audit_logs table:', err);
-            reject(err);
-            return;
-          }
-
-          db.all("PRAGMA table_info(users)", (err, rows: any) => {
-            if (!err && rows) {
-              const hasFullName = rows.some((row: any) => row.name === 'full_name');
-              if (!hasFullName) {
-                db.run('ALTER TABLE users ADD COLUMN full_name TEXT NOT NULL DEFAULT ""', (err) => {
-                  if (err) {
-                    console.error('Error adding full_name column:', err);
-                    reject(err);
-                  } else {
-                    console.log('Added full_name column to users table');
-                    resolve();
-                  }
-                });
-              } else {
-                console.log('full_name column already exists in users table');
-                resolve();
-              }
-            } else {
-              console.error('Error checking table info:', err);
-              reject(err);
-            }
-          });
-        });
-      });
-    });
-  });
-};
-
-export { initializeDatabase };
-
-export { db };
-export default db; 
+// Create Models
+export const User = mongoose.model('User', userSchema);
+export const Product = mongoose.model('Product', productSchema);
+export const AuditLog = mongoose.model('AuditLog', auditLogSchema);

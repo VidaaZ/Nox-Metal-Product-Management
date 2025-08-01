@@ -1,6 +1,7 @@
-import { db } from '../models/database.js';
+import { Product as ProductModel, User as UserModel } from '../models/database.js';
 import { Product, ProductInput, ProductQuery, PaginatedResponse } from '../types/index.js';
 import { logAuditAction } from '../utils/auditLogger.js';
+import { Types } from 'mongoose';
 
 export class ProductService {
   async getProducts(query: ProductQuery, isAdmin: boolean): Promise<PaginatedResponse<Product>> {
@@ -13,59 +14,46 @@ export class ProductService {
       includeDeleted = false
     } = query;
 
-    const offset = (Number(page) - 1) * Number(limit);
+    const skip = (Number(page) - 1) * Number(limit);
     const showDeleted = isAdmin && String(includeDeleted) === 'true';
     
-    let whereClause = '';
-    let searchClause = '';
-    let params: any[] = [];
+    // Build filter
+    const filter: any = { is_deleted: showDeleted };
 
-    if (showDeleted) {
-      whereClause = 'WHERE is_deleted = 1';
-    } else {
-      whereClause = 'WHERE is_deleted = 0';
-    }
-
+    // Add search filter
     if (search) {
-      searchClause = showDeleted 
-        ? 'AND (name LIKE ? OR description LIKE ?)'
-        : 'AND (name LIKE ? OR description LIKE ?)';
-      params.push(`%${search}%`, `%${search}%`);
+      filter.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } }
+      ];
     }
 
-    const orderClause = `ORDER BY ${sortBy} ${sortOrder}`;
+    // Build sort
+    const sort: any = {};
+    sort[sortBy] = sortOrder === 'asc' ? 1 : -1;
 
-    const countQuery = `
-      SELECT COUNT(*) as count FROM products 
-      ${whereClause} ${searchClause}
-    `;
+    // Get total count
+    const total = await ProductModel.countDocuments(filter);
 
-    const total = await new Promise<number>((resolve, reject) => {
-      db.get(countQuery, params, (err, row: any) => {
-        if (err) reject(err);
-        else resolve(row.count);
-      });
-    });
+    // Get products with populated creator info
+    const foundProducts = await ProductModel
+      .find(filter)
+      .populate('created_by', 'email')
+      .sort(sort)
+      .skip(skip)
+      .limit(Number(limit))
+      .lean();
 
-    const productsQuery = `
-      SELECT p.*, u.email as created_by_email 
-      FROM products p
-      LEFT JOIN users u ON p.created_by = u.id
-      ${whereClause} ${searchClause}
-      ${orderClause}
-      LIMIT ? OFFSET ?
-    `;
-
-    const products = await new Promise<Product[]>((resolve, reject) => {
-      db.all(
-        productsQuery,
-        [...params, Number(limit), offset],
-        (err, rows: Product[]) => {
-          if (err) reject(err);
-          else resolve(rows);
-        }
-      );
-    });
+    const products: Product[] = foundProducts.map(product => ({
+      _id: product._id,
+      name: product.name,
+      price: product.price,
+      description: product.description || undefined,
+      is_deleted: product.is_deleted,
+      created_by: product.created_by,
+      created_at: (product as any).createdAt || new Date(),
+      updated_at: (product as any).updatedAt || new Date()
+    }));
 
     return {
       data: products,
@@ -78,26 +66,33 @@ export class ProductService {
     };
   }
 
-  async getProduct(id: number, isAdmin: boolean): Promise<Product> {
-    const product = await new Promise<Product | undefined>((resolve, reject) => {
-      const query = isAdmin 
-        ? 'SELECT * FROM products WHERE id = ?'
-        : 'SELECT * FROM products WHERE id = ? AND is_deleted = 0';
-      
-      db.get(query, [id], (err, row: Product) => {
-        if (err) reject(err);
-        else resolve(row);
-      });
-    });
+  async getProduct(id: string, isAdmin: boolean): Promise<Product> {
+    const filter: any = { _id: new Types.ObjectId(id) };
+    if (!isAdmin) {
+      filter.is_deleted = false;
+    }
 
-    if (!product) {
+    const foundProduct = await ProductModel.findOne(filter).lean();
+
+    if (!foundProduct) {
       throw new Error('Product not found');
     }
+
+    const product: Product = {
+      _id: foundProduct._id,
+      name: foundProduct.name,
+      price: foundProduct.price,
+      description: foundProduct.description || undefined,
+      is_deleted: foundProduct.is_deleted,
+      created_by: foundProduct.created_by,
+      created_at: (foundProduct as any).createdAt || new Date(),
+      updated_at: (foundProduct as any).updatedAt || new Date()
+    };
 
     return product;
   }
 
-  async createProduct(productData: ProductInput, userId: number, userEmail: string): Promise<{ id: number }> {
+  async createProduct(productData: ProductInput, userId: string, userEmail: string): Promise<{ id: string }> {
     const { name, price, description } = productData;
 
     if (!name || !price) {
@@ -108,41 +103,31 @@ export class ProductService {
       throw new Error('Price must be greater than 0');
     }
 
-    const now = new Date();
-    const canadaTime = new Date(now.toLocaleString("en-US", {timeZone: "America/Toronto"}));
-    const timestamp = canadaTime.toISOString();
-
-    const result = await new Promise<{ id: number }>((resolve, reject) => {
-      db.run(
-        'INSERT INTO products (name, price, description, created_by, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)',
-        [name, price, description || null, userId, timestamp, timestamp],
-        function (err) {
-          if (err) reject(err);
-          else resolve({ id: this.lastID });
-        }
-      );
+    const newProduct = new ProductModel({
+      name,
+      price,
+      description,
+      created_by: new Types.ObjectId(userId),
+      is_deleted: false
     });
+
+    const savedProduct = await newProduct.save();
 
     await logAuditAction(
       'create',
       userEmail,
-      result.id,
+      savedProduct._id.toString(),
       name,
       'Product created'
     );
 
-    return result;
+    return { id: savedProduct._id.toString() };
   }
 
-  async updateProduct(id: number, productData: Partial<ProductInput>, userEmail: string): Promise<void> {
+  async updateProduct(id: string, productData: Partial<ProductInput>, userEmail: string): Promise<void> {
     const { name, price, description } = productData;
 
-    const existingProduct = await new Promise<Product | undefined>((resolve, reject) => {
-      db.get('SELECT * FROM products WHERE id = ?', [id], (err, row: Product) => {
-        if (err) reject(err);
-        else resolve(row);
-      });
-    });
+    const existingProduct = await ProductModel.findById(id);
 
     if (!existingProduct) {
       throw new Error('Product not found');
@@ -152,64 +137,38 @@ export class ProductService {
       throw new Error('Cannot update deleted product');
     }
 
-    const updates: string[] = [];
-    const values: any[] = [];
+    const updates: any = {};
 
     if (name !== undefined) {
-      updates.push('name = ?');
-      values.push(name);
+      updates.name = name;
     }
     if (price !== undefined) {
       if (price <= 0) {
         throw new Error('Price must be greater than 0');
       }
-      updates.push('price = ?');
-      values.push(price);
+      updates.price = price;
     }
     if (description !== undefined) {
-      updates.push('description = ?');
-      values.push(description);
+      updates.description = description;
     }
 
-    if (updates.length === 0) {
+    if (Object.keys(updates).length === 0) {
       throw new Error('No fields to update');
     }
 
-    const now = new Date();
-    const canadaTime = new Date(now.toLocaleString("en-US", {timeZone: "America/Toronto"}));
-    const timestamp = canadaTime.toISOString();
-
-    updates.push('updated_at = ?');
-    values.push(timestamp);
-    values.push(id);
-
-    await new Promise<void>((resolve, reject) => {
-      db.run(
-        `UPDATE products SET ${updates.join(', ')} WHERE id = ?`,
-        values,
-        (err) => {
-          if (err) reject(err);
-          else resolve();
-        }
-      );
-    });
+    await ProductModel.findByIdAndUpdate(id, updates);
 
     await logAuditAction(
       'update',
       userEmail,
-      Number(id),
+      id,
       existingProduct.name,
       'Product updated'
     );
   }
 
-  async deleteProduct(id: number, userEmail: string): Promise<void> {
-    const existingProduct = await new Promise<Product | undefined>((resolve, reject) => {
-      db.get('SELECT * FROM products WHERE id = ?', [id], (err, row: Product) => {
-        if (err) reject(err);
-        else resolve(row);
-      });
-    });
+  async deleteProduct(id: string, userEmail: string): Promise<void> {
+    const existingProduct = await ProductModel.findById(id);
 
     if (!existingProduct) {
       throw new Error('Product not found');
@@ -219,37 +178,19 @@ export class ProductService {
       throw new Error('Product is already deleted');
     }
 
-    const now = new Date();
-    const canadaTime = new Date(now.toLocaleString("en-US", {timeZone: "America/Toronto"}));
-    const timestamp = canadaTime.toISOString();
-
-    await new Promise<void>((resolve, reject) => {
-      db.run(
-        'UPDATE products SET is_deleted = 1, updated_at = ? WHERE id = ?',
-        [timestamp, id],
-        function (err) {
-          if (err) reject(err);
-          else resolve();
-        }
-      );
-    });
+    await ProductModel.findByIdAndUpdate(id, { is_deleted: true });
 
     await logAuditAction(
       'delete',
       userEmail,
-      Number(id),
+      id,
       existingProduct.name,
       'Product soft deleted'
     );
   }
 
-  async restoreProduct(id: number, userEmail: string): Promise<void> {
-    const existingProduct = await new Promise<Product | undefined>((resolve, reject) => {
-      db.get('SELECT * FROM products WHERE id = ?', [id], (err, row: Product) => {
-        if (err) reject(err);
-        else resolve(row);
-      });
-    });
+  async restoreProduct(id: string, userEmail: string): Promise<void> {
+    const existingProduct = await ProductModel.findById(id);
 
     if (!existingProduct) {
       throw new Error('Product not found');
@@ -259,29 +200,16 @@ export class ProductService {
       throw new Error('Product is not deleted');
     }
 
-    const now = new Date();
-    const canadaTime = new Date(now.toLocaleString("en-US", {timeZone: "America/Toronto"}));
-    const timestamp = canadaTime.toISOString();
-
-    await new Promise<void>((resolve, reject) => {
-      db.run(
-        'UPDATE products SET is_deleted = 0, updated_at = ? WHERE id = ?',
-        [timestamp, id],
-        function (err) {
-          if (err) reject(err);
-          else resolve();
-        }
-      );
-    });
+    await ProductModel.findByIdAndUpdate(id, { is_deleted: false });
 
     await logAuditAction(
       'restore',
       userEmail,
-      Number(id),
+      id,
       existingProduct.name,
       'Product restored from deleted state'
     );
   }
 }
 
-export const productService = new ProductService(); 
+export const productService = new ProductService();

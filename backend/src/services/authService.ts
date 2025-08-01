@@ -1,97 +1,114 @@
 import bcrypt from 'bcryptjs';
-import { db } from '../models/database.js';
+import { User as UserModel } from '../models/database.js';
 import { generateToken } from '../utils/jwt.js';
 import { User, AuthenticatedUser } from '../types/index.js';
 
 export class AuthService {
   async register(email: string, password: string, fullName: string): Promise<{ user: User; token: string }> {
-    const existingUser = await new Promise<User | undefined>((resolve, reject) => {
-      db.get('SELECT * FROM users WHERE email = ?', [email], (err, row: User) => {
-        if (err) reject(err);
-        else resolve(row);
-      });
-    });
+    const existingUser = await UserModel.findOne({ email: email.toLowerCase() });
 
     if (existingUser) {
       throw new Error('User already exists');
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const now = new Date();
-    const canadaTime = new Date(now.toLocaleString("en-US", {timeZone: "America/Toronto"}));
-    const timestamp = canadaTime.toISOString();
 
-    const result = await new Promise<{ id: number }>((resolve, reject) => {
-      db.run(
-        'INSERT INTO users (email, full_name, password, role, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)',
-        [email, fullName, hashedPassword, 'user', timestamp, timestamp],
-        function (err) {
-          if (err) reject(err);
-          else resolve({ id: this.lastID });
-        }
-      );
-    });
-
-    const user: User = {
-      id: result.id,
-      email,
+    const newUser = new UserModel({
+      email: email.toLowerCase(),
       full_name: fullName,
       password: hashedPassword,
-      role: 'user',
-      created_at: timestamp,
-      updated_at: timestamp
+      role: 'user'
+    });
+
+    const savedUser = await newUser.save();
+
+    const user: User = {
+      _id: savedUser._id,
+      email: savedUser.email,
+      full_name: savedUser.full_name,
+      password: savedUser.password,
+      role: savedUser.role,
+      created_at: (savedUser as any).createdAt || new Date(),
+      updated_at: (savedUser as any).updatedAt || new Date()
     };
 
-    const token = generateToken(user as AuthenticatedUser);
+    const token = generateToken({
+      id: savedUser._id.toString(),
+      email: savedUser.email,
+      full_name: savedUser.full_name,
+      role: savedUser.role
+    } as AuthenticatedUser);
 
     return { user, token };
   }
 
   async login(email: string, password: string): Promise<{ user: User; token: string }> {
-    const user = await new Promise<User | undefined>((resolve, reject) => {
-      db.get('SELECT * FROM users WHERE email = ?', [email], (err, row: User) => {
-        if (err) reject(err);
-        else resolve(row);
-      });
-    });
+    const foundUser = await UserModel.findOne({ email: email.toLowerCase() });
 
-    if (!user) {
+    if (!foundUser) {
       throw new Error('Invalid credentials');
     }
 
-    const isValidPassword = await bcrypt.compare(password, user.password);
+    const isValidPassword = await bcrypt.compare(password, foundUser.password);
     if (!isValidPassword) {
       throw new Error('Invalid credentials');
     }
 
-    const token = generateToken(user as AuthenticatedUser);
+    const user: User = {
+      _id: foundUser._id,
+      email: foundUser.email,
+      full_name: foundUser.full_name,
+      password: foundUser.password,
+      role: foundUser.role,
+      created_at: (foundUser as any).createdAt || new Date(),
+      updated_at: (foundUser as any).updatedAt || new Date()
+    };
+
+    const token = generateToken({
+      id: foundUser._id.toString(),
+      email: foundUser.email,
+      full_name: foundUser.full_name,
+      role: foundUser.role
+    } as AuthenticatedUser);
 
     return { user, token };
   }
 
-  async getProfile(userId: number): Promise<User> {
-    const user = await new Promise<User | undefined>((resolve, reject) => {
-      db.get('SELECT id, email, full_name, password, role, created_at, updated_at FROM users WHERE id = ?', [userId], (err, row: User) => {
-        if (err) reject(err);
-        else resolve(row);
-      });
-    });
+  async getProfile(userId: string): Promise<User> {
+    const foundUser = await UserModel.findById(userId);
 
-    if (!user) {
+    if (!foundUser) {
       throw new Error('User not found');
     }
+
+    const user: User = {
+      _id: foundUser._id,
+      email: foundUser.email,
+      full_name: foundUser.full_name,
+      password: foundUser.password,
+      role: foundUser.role,
+      created_at: (foundUser as any).createdAt || new Date(),
+      updated_at: (foundUser as any).updatedAt || new Date()
+    };
 
     return user;
   }
 
   async getAllUsers(): Promise<User[]> {
-    return new Promise<User[]>((resolve, reject) => {
-      db.all('SELECT id, email, full_name, password, role, created_at, updated_at FROM users ORDER BY created_at DESC', (err, rows: User[]) => {
-        if (err) reject(err);
-        else resolve(rows);
-      });
-    });
+    const foundUsers = await UserModel.find({})
+      .sort({ created_at: -1 })
+      .lean();
+
+    return foundUsers.map(user => ({
+      _id: user._id,
+      email: user.email,
+      full_name: user.full_name,
+      password: user.password,
+      role: user.role,
+      created_at: (user as any).createdAt || new Date(),
+      updated_at: (user as any).updatedAt || new Date()
+    }));
   }
 }
 
-export const authService = new AuthService(); 
+export const authService = new AuthService();
