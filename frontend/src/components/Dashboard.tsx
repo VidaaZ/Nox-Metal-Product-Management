@@ -40,7 +40,8 @@ const Dashboard: React.FC = () => {
             limit: 1,
             includeDeleted: true 
           });
-          deletedCount = Math.max(0, deletedResponse.pagination.total - productsResponse.pagination.total);
+          // When includeDeleted is true, it now returns ONLY deleted products
+          deletedCount = deletedResponse.pagination.total;
         }
 
         setStats({
