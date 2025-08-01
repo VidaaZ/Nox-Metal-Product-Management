@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const MONGODB_URI = process.env.MONGODB_URI || `mongodb+srv://vida1997zarei:test123@cluster0.fimrovg.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
+const MONGODB_URI = process.env.MONGODB_URI || `mongodb+srv://vida1997zarei:test123@cluster0.fimrovg.mongodb.net/Nox-Metal?retryWrites=true&w=majority&appName=Cluster0`;
 
 export const connectToDatabase = async (): Promise<void> => {
   try {

@@ -18,7 +18,12 @@ app.use(helmet());
 
 app.use(cors({
   origin: function (origin, callback) {
-    const allowedOrigins = ['http://localhost:5173', 'http://localhost:3000'];
+    const allowedOrigins = [
+      'http://localhost:5173', 
+      'http://localhost:3000',
+      'https://nox-metal-product-management.vercel.app',
+      'https://nox-metal-product-management-git-main-vidaaz.vercel.app'
+    ];
     console.log('CORS check for origin:', origin);
     console.log('Allowed origins:', allowedOrigins);
     
