@@ -292,6 +292,10 @@
     display: none;
   }
   
+  .mobileMenuButton {
+    display: block;
+  }
+  
   .mobileMenu {
     display: block;
   }
@@ -341,4 +345,23 @@
     background-color: #4b5563;
     color: #f9fafb;
   }
+} 
+
+.mobileMenuButton {
+  display: none;
+  padding: 0.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #6b7280;
+  transition: color 0.2s ease;
+}
+
+.mobileMenuButton:hover {
+  color: #111827;
+}
+
+.hamburgerIcon {
+  width: 1.5rem;
+  height: 1.5rem;
 } 
